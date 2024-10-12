@@ -94,6 +94,16 @@ for i in range(len(df['Total_Nonfatal_Injuries'])):
 df['severity'] = severity_data 
 print(df.head())
 
+min_severity = df['severity'].min()
+max_severity = df['severity'].max()
+
+#  normalization
+df['severity'] = (df['severity'] - min_severity) / (max_severity - min_severity)
+
+print(df['severity'])
+
+#scan data
+df.replace({True: 1, False: 0}, inplace=True)
 
 #testing data
 testing_df = df[['Road_Enc_Bad Road', 'Road_Enc_Extreme Road', 'Road_Enc_Good Road', 
@@ -101,39 +111,31 @@ testing_df = df[['Road_Enc_Bad Road', 'Road_Enc_Extreme Road', 'Road_Enc_Good Ro
                  'Weather_Enc_Extreme Weather', 'Weather_Enc_Good Weather', 
                  'Weather_Enc_Mediocre Weather', 'severity']]
 
+print(testing_df)
+
+
 train, valid, test = np.split(testing_df.sample(frac=1), [int(0.6*len(testing_df)), int(0.8*len(testing_df))]) 
 
-def scale_dataset(dataframe, oversample = False):
-    X = dataframe[dataframe.columns[:-1]].values
-    y = dataframe[dataframe.columns[-1]].values
-    
-    if oversample:
-        ros = RandomOverSampler()
-        X, y = ros.fit_resample(X, y)
-    
-    data = np.hstack((X, np.reshape(y, (-1, 1))))
-    
-    return data, X, y
+# Split the data into features and target
+def split_features_target(dataframe):
+    X = dataframe[dataframe.columns[:-1]].values  # All columns except the last one
+    y = dataframe[dataframe.columns[-1]].values   # The last column
+    return X, y
 
-print(scale_dataset(train, oversample = True))
-
-
-train, X_train, y_train = scale_dataset(train, oversample=True)
-valid, X_valid, y_valid = scale_dataset(valid, oversample=False)
-test, X_test, y_test = scale_dataset(test, oversample=False)
+# Apply the function to each set
+X_train, y_train = split_features_target(train)
+X_valid, y_valid = split_features_target(valid)
+X_test, y_test = split_features_target(test)
 
 #Model
 
 from sklearn.ensemble import RandomForestRegressor
 
-from sklearn.metrics import classification_report 
-
 reg = RandomForestRegressor()
 reg.fit(X_train, y_train) 
-RandomForestRegressor()
 
 y_pred = reg.predict(X_test) 
-print(classification_report(y_test, y_pred)) 
+
 
 
 
