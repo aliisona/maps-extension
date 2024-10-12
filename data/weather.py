@@ -21,9 +21,32 @@ def get_weather_description_boston(api_key):
         data = response.json()
         weather_desc = data['weather'][0]['description']
         print(f"Today's weather in Boston, MA: {weather_desc}")
+        match (weather_desc):
+            case "clear sky":
+                return 0
+            case "few clouds":
+                return 0.1
+            case "scattered clouds":
+                return 0.2
+            case "broken clouds":
+                return 0.3
+            case "shower rain":
+                return 0.5
+            case "rain":
+                return 0.6
+            case "thunderstorm":
+                return 0.9
+            case "snow":
+                return 0.7
+            case "mist":
+                return 0.4
+            case _:
+                return 0
+            
     else:
         print(f"Error: Unable to fetch weather for Boston. Status code: {response.status_code}")
 
 if __name__ == "__main__":
     api_key = os.getenv('OPENWEATHER_API_KEY')
-    get_weather_description_boston(api_key)
+    (get_weather_description_boston(api_key))
+
