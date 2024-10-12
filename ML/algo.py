@@ -2,20 +2,15 @@ import pandas as pd
 import csv
 import numpy as np 
 import seaborn as sns
-print("seaborn")
 import matplotlib.pyplot as plt
-print("matplotlib")
 from sklearn.model_selection import train_test_split
-print("sklearn")
 from sklearn.preprocessing import OrdinalEncoder, LabelEncoder, StandardScaler
 from sklearn.preprocessing import MinMaxScaler
-print("sklearn2")
+from sklearn.metrics import r2_score
+
 from imblearn.over_sampling import RandomOverSampler
-print("imblearn")
 from sklearn.impute import SimpleImputer
-print("sklearn3")
 import tensorflow as tf
-print("tensorflow")
  
 # Load the Data
 
@@ -73,15 +68,15 @@ def categorize_condition(condition, categories):
 df['Road_Category'] = df['Road_Surface_Condition'].apply(lambda x: categorize_condition(x, road_categories))
 df['Weather_Category'] = df['Weather_Condition'].apply(lambda x: categorize_condition(x, weather_categories))
 
-print(df.head())
+# print(df.head())
 
 #One hot encoding
 road_encoded = pd.get_dummies(df['Road_Category'], prefix='Road_Enc')
 weather_encoded = pd.get_dummies(df['Weather_Category'], prefix='Weather_Enc')
 df = pd.concat([df, road_encoded, weather_encoded], axis=1)
 
-print(df)
-print(df.columns)
+# print(df)
+# print(df.columns)
 
 #Output/Number
 
@@ -92,7 +87,7 @@ for i in range(len(df['Total_Nonfatal_Injuries'])):
     severity_data.append(score)
 
 df['severity'] = severity_data 
-print(df.head())
+# print(df.head())
 
 min_severity = df['severity'].min()
 max_severity = df['severity'].max()
@@ -100,7 +95,7 @@ max_severity = df['severity'].max()
 #  normalization
 df['severity'] = (df['severity'] - min_severity) / (max_severity - min_severity)
 
-print(df['severity'])
+# print(df['severity'])
 
 #scan data
 df.replace({True: 1, False: 0}, inplace=True)
@@ -111,7 +106,8 @@ testing_df = df[['Road_Enc_Bad Road', 'Road_Enc_Extreme Road', 'Road_Enc_Good Ro
                  'Weather_Enc_Extreme Weather', 'Weather_Enc_Good Weather', 
                  'Weather_Enc_Mediocre Weather', 'severity']]
 
-print(testing_df)
+# print(testing_df)
+
 
 
 train, valid, test = np.split(testing_df.sample(frac=1), [int(0.6*len(testing_df)), int(0.8*len(testing_df))]) 
@@ -135,7 +131,8 @@ reg = RandomForestRegressor()
 reg.fit(X_train, y_train) 
 
 y_pred = reg.predict(X_test) 
-
+r1_r2 = r2_score(y_test, y_pred)
+print(r1_r2)
 
 
 
