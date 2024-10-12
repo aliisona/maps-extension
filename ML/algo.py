@@ -32,48 +32,51 @@ df.columns = cols
 cols_keep = ["Road_Surface_Condition", "Weather_Condition", "Maximum_Injury_Severity_Reported" ,"Total_Nonfatal_Injuries", "Total_Fatal_Injuries"]
 df = df[cols_keep]
 
-print(df.head())
+exclude_weather_conditions = ['Not Reported', 'Snow/Other', 'Clear/Other', 'Unknown', 'Cloudy/Other', 
+                      'Snow/Unknown', 'Cloudy/Unknown', 'Clear/Unknown', 'Rain/Unknown', 'Other', 
+                      'Unknown/Unknown', 'Unknown/Cloudy', 'Rain/Other', 'Other/Snow', 'Other/Clear', 
+                      'Other/Other', 'Sleet, hail (freezing rain or drizzle)/Unknown', 'Unknown/Clear', 
+                      'Other/Unknown', 'Severe crosswinds/Other', 'Other/Rain']
 
+df = df[~df['Weather_Condition'].isin(exclude_weather_conditions)]
 
+exclude_road_conditions = ['Not reported', 'Unknown', 'Other']
 
-# #sort our data
-# df_filtered = df[df['weather_condition'] != 'Not Reported']
+df = df[~df['Road_Surface_Condition'].isin(exclude_road_conditions)]
+#sort the data
 
+road_categories =  {
+    'Good Road': ['Dry'],
+    'Mediocre Road': ['Wet'],
+    'Bad Road': ['Snow', 'Slush', 'Sand, mud, dirt, oil, gravel', 'Water (standing, moving)'],
+    'Extreme Road': ['Ice'] }
 
-# #road_surface_condition:
-# encoder_road = OrdinalEncoder(categories=[['dry', 'wet', 'ice']])
-# encoded_data_road = encoder_road.fit_transform(df[['Road_Surface_Condition']])
-
-# # Weather_Condition:
-
-
-# unique_entries = sorted(list(set(df['Road_Surface_Condition'])))
-# print(unique_entries)
-
-categories = {
-    'Good_Weather': [],
-    'Okay_Weather': [],
-    'Precipitation': [],
-    'Severe': []
+weather_categories = {
+    'Good Weather': ['Clear', 'Clear/Clear'],
+    
+    'Mediocre Weather': ['Cloudy', 'Cloudy/Cloudy', 'Clear/Cloudy', 'Cloudy/Clear'],
+    
+    'Bad Weather': ['Rain', 'Snow', 'Snow/Snow', 'Cloudy/Snow', 'Snow/Rain', 'Clear/Snow', 'Snow/Clear', 'Cloudy/Rain', 'Rain/Cloudy', 'Rain/Rain', 'Rain/Snow', 'Rain/Clear', 'Snow/Cloudy', 'Fog, smog, smoke', 'Rain/Fog, smog, smoke', 'Cloudy/Fog, smog, smoke', 'Fog, smog, smoke/Rain', 'Fog, smog, smoke/Fog, smog, smoke', 'Fog, smog, smoke/Cloudy', 'Snow/Fog, smog, smoke']
+,
+    
+    'Extreme Weather': ['Sleet, hail (freezing rain or drizzle)', 'Snow/Sleet, hail (freezing rain or drizzle)', 'Snow/Blowing sand, snow', 'Clear/Blowing sand, snow', 'Sleet, hail (freezing rain or drizzle)/Sleet, hail (freezing rain or drizzle)', 'Rain/Sleet, hail (freezing rain or drizzle)', 'Rain/Severe crosswinds', 'Clear/Sleet, hail (freezing rain or drizzle)', 'Clear/Severe crosswinds', 'Snow/Severe crosswinds', 'Cloudy/Blowing sand, snow', 'Blowing sand, snow/Blowing sand, snow', 'Sleet, hail (freezing rain or drizzle)/Rain', 'Cloudy/Sleet, hail (freezing rain or drizzle)', 'Sleet, hail (freezing rain or drizzle)/Cloudy', 'Rain/Blowing sand, snow', 'Severe crosswinds', 'Blowing sand, snow', 'Sleet, hail (freezing rain or drizzle)/Blowing sand, snow', 'Clear/Fog, smog, smoke', 'Sleet, hail (freezing rain or drizzle)/Clear', 'Sleet, hail (freezing rain or drizzle)/Snow', 'Sleet, hail (freezing rain or drizzle)/Severe crosswinds', 'Severe crosswinds/Blowing sand, snow', 'Cloudy/Severe crosswinds', 'Severe crosswinds/Severe crosswinds', 'Blowing sand, snow/Sleet, hail (freezing rain or drizzle)', 'Severe crosswinds/Rain', 'Severe crosswinds/Clear']
 }
 
+#apply sorting
 
+def categorize_condition(condition, categories):
+    for category, conditions in categories.items():
+        if condition in conditions:
+            return category
 
+df['Road_Category'] = df['Road_Surface_Condition'].apply(lambda x: categorize_condition(x, road_categories))
+df['Weather_Category'] = df['Weather_Condition'].apply(lambda x: categorize_condition(x, weather_categories))
 
+print(df.head())
+print(df.shape())
 
-# def csvFilter():
-#     with open('data/BostonCrashDetails.csv', newline='') as csvfile:
-#         reader = csv.reader(csvfile, delimiter=' ')
-#         out = []
-
-#         for row in reader:
-#                 print(row[0])
-
-
-# csvFilter()
-
-
-
-
+#One hot encoding
+columns_one_hot= ["Road_Category", "Weather_Category"]
+df = pd.get_dummies(df, columns = columns_one_hot, prefix = columns_one_hot, drop_first = True )
 
 
