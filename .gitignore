@@ -1,4 +1,5 @@
 config.js
+.env
 .DS_Store
 
 # venv folder names
