@@ -1,2 +1,9 @@
 config.js
 api/massachusetts-latest.osm.pbf
+.DS_Store
+
+# venv folder names
+hackharvard
+
+# data testing
+api/Massachusets.osm
