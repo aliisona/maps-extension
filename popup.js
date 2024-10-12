@@ -1,73 +1,134 @@
-let map;
-let directionsService;
-let directionsRenderer;
+// handle generating path from user input
+document.getElementById('generate').addEventListener('click', () => {
+  const start = document.getElementById('start').value;
+  const end = document.getElementById('end').value;
 
-document.addEventListener('DOMContentLoaded', function() {
-  console.log("loaded....");
+  // clear previous status and results
+  document.getElementById('status').innerText = '';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('error').innerText = '';
 
-  const apiKey = config.GOOGLE_MAPS_API_KEY;
+  if (start && end) {
+    console.log('getting path from:', start, 'to:', end);
+    document.getElementById('status').innerText = 'fetching path...';
 
-//load api
-  const script = document.createElement('script');
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`;
-  
-  script.onload = initializeMap; 
-  document.head.appendChild(script); // script to the document head
-  console.log("map script added");
+    // send the request to flask
+    fetch('http://127.0.0.1:5000/get-walking-path', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ start, end })
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('status').innerText = '';
 
-  function initializeMap() {
-      if (typeof google !== 'undefined') {
-          console.log("map initialized");
-          directionsService = new google.maps.DirectionsService();
-          directionsRenderer = new google.maps.DirectionsRenderer();
-          const mapOptions = {
-              zoom: 7,
-              center: { lat: -35, lng: 150 } //random cords
-          };
-          const map = new google.maps.Map(document.getElementById('map'), mapOptions);
-          directionsRenderer.setMap(map); // map for direction
+      if (data.error) {
+        document.getElementById('error').innerText = data.error;
+        document.getElementById('result').style.display = 'block';
       } else {
-          console.error("Google Maps API not loaded properly.");
+        const walkingTime = data.duration;
+        document.getElementById('walking-time').innerText = `walking time: ${walkingTime}`;
+        document.getElementById('result').style.display = 'block';
+
+        // inject info into google maps page
+        injectInfoIntoGoogleMaps(`walking time: ${walkingTime}`);
       }
+    })
+    .catch(error => {
+      console.error('fetch error:', error);
+      document.getElementById('status').innerText = '';
+      document.getElementById('error').innerText = 'error fetching data';
+      document.getElementById('result').style.display = 'block';
+    });
+  } else {
+    // display a message if start or end locations are missing
+    document.getElementById('status').innerText = 'please enter both start and end locations';
   }
 });
 
-document.getElementById('show-route-button').addEventListener("click", function getCurrentRoute() {
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+// handle using the current path from google maps url
+document.getElementById('use-current').addEventListener('click', () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const currentTab = tabs[0];
-    console.log("pressed");
-    if (currentTab.url.includes('google.com/maps/dir')) {
-      const urlParams = new URLSearchParams(currentTab.url.split('?')[1]);
-      const origin = urlParams.get('origin');
-      const destination = urlParams.get('destination');
+    const url = currentTab.url;
 
-      if (origin && destination) {
-        document.getElementById('origin').value = decodeURIComponent(origin);
-        document.getElementById('destination').value = decodeURIComponent(destination);
-      }
+    // try to extract start and end from the google maps url
+    const pathRegex = /\/dir\/([^\/]+)\/([^\/]+)\//;
+    const match = url.match(pathRegex);
+
+    if (match && match.length >= 3) {
+      const start = decodeURIComponent(match[1].replace(/\+/g, ' '));
+      const end = decodeURIComponent(match[2].replace(/\+/g, ' '));
+      console.log('got start:', start, 'and end:', end);
+
+      document.getElementById('status').innerText = 'using current path from url...';
+
+      // send extracted start and end to backend
+      fetch('http://127.0.0.1:5000/get-walking-path', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ start, end })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('status').innerText = '';
+
+        if (data.error) {
+          document.getElementById('error').innerText = data.error;
+          document.getElementById('result').style.display = 'block';
+        } else {
+          const walkingTime = data.duration;
+          document.getElementById('walking-time').innerText = `current path time: ${walkingTime}`;
+          document.getElementById('result').style.display = 'block';
+
+          // inject info into google maps page
+          injectInfoIntoGoogleMaps(`current path time: ${walkingTime}`);
+        }
+      })
+      .catch(error => {
+        console.error('fetch error:', error);
+        document.getElementById('status').innerText = '';
+        document.getElementById('error').innerText = 'error fetching data';
+        document.getElementById('result').style.display = 'block';
+      });
     } else {
-      console.warn('Not a Google Maps direction URL');
+      console.log('could not get start and end from the url');
+      document.getElementById('status').innerText = 'no valid path found in url';
     }
   });
-})
 
-document.getElementById('calculate-button').addEventListener("click",  function calculateRoute(event) {
-  event.preventDefault(); //prevent default
+  // inject a simple "HELLO!" to the google maps page
+  injectInfoIntoGoogleMaps("HELLO!");
+});
 
-  const origin = document.getElementById('origin').value;
-  const destination = document.getElementById('destination').value;
+//inject
+function injectInfoIntoGoogleMaps(infoText) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    chrome.scripting.executeScript({
+      target: { tabId: tabs[0].id },
+      func: (infoText) => {
+        console.log('Injecting info into the side panel...');
 
-  const request = {
-    origin: origin,
-    destination: destination,
-    travelMode: google.maps.TravelMode.WALKING // make walk
-  };
+        const sidePanel = document.querySelector('.aIFcqe');  
+        if (sidePanel) {
+          const injectedDiv = document.createElement('div');
+          injectedDiv.style.color = 'blue';  
+          injectedDiv.style.margin = '10px 0';
+          injectedDiv.style.fontSize = '16px';
+          injectedDiv.innerText = infoText;
 
-  directionsService.route(request, function(result, status) {
-    if (status === google.maps.DirectionsStatus.OK) {
-      directionsRenderer.setDirections(result);
-    } else {
-      console.error('Directions request failed due to ' + status);
-    }
+          sidePanel.prepend(injectedDiv);
+
+          console.log('Injected info into the side panel:', infoText);
+        } else {
+          console.error('Side panel not found on Google Maps page');
+        }
+      },
+      args: [infoText]
+    });
   });
-})
+}
