@@ -1,4 +1,9 @@
 import requests
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 def get_weather_description_boston(api_key):
     zip_code = "02108"  # boston
@@ -20,5 +25,4 @@ def get_weather_description_boston(api_key):
         print(f"Error: Unable to fetch weather for Boston. Status code: {response.status_code}")
 
 if __name__ == "__main__":
-    api_key = "533061a3e7510164e3d7e518f28792d3"  
-    get_weather_description_boston(api_key)
+    get_weather_description_boston(key=os.getenv('OPENWEATHER_API_KEY'))
