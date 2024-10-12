@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Google Maps Walking Path Overlay",
+  "name": "Google Maps Safe-Route Integration",
   "version": "1.0",
-  "description": "Overlay walking paths on Google Maps.",
+  "description": "Is the path you're taking safe?",
   "permissions": [
     "geolocation",
     "storage",

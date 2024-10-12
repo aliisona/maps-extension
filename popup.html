@@ -3,44 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Google Maps Walking Path Overlay</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        width: 250px;
-        padding: 10px;
-      }
-      input, button {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-      #status {
-        font-size: 12px;
-        color: gray;
-      }
-      #result {
-        margin-top: 10px;
-        padding: 10px;
-        background-color: #f0f0f0;
-        display: none;
-      }
-      #error {
-        color: red;
-      }
-      #current-path-status {
-        font-size: 14px;
-        color: blue;
-        margin-bottom: 10px;
-      }
-    </style>
+    <title>Safe-Route</title>
+    <link rel="stylesheet" href="styles.css">
+    
   </head>
   <body>
-    <h3>Walking Path Overlay</h3>
+    <h3>Safe-Route</h3>
     <label for="start">Start:</label>
     <input type="text" id="start" placeholder="Start location" />
     <label for="end">End:</label>
     <input type="text" id="end" placeholder="End location" />
     <button id="generate">Generate Path</button>
+
     <button id="use-current">Use Current Path</button>
 
     <div id="current-path-status">Checking for current path...</div>
@@ -50,6 +24,7 @@
     <div id="result">
       <p id="walking-time"></p>
       <p id="error"></p>
+    </div>
     </div>
 
     <script src="popup.js"></script>

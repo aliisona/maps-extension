@@ -1,11 +1,20 @@
 from flask import Flask, request, jsonify
 import googlemaps
 from flask_cors import CORS
+import os  # os
 
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+# import flask
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
-# init Google Maps client
-gmaps = googlemaps.Client(key="AIzaSyAaLjlgAZSho352xp9K8oJLt-d7ARm_iHE")
+
+# Initialize Google Maps client with the API key from the environment
+gmaps = googlemaps.Client(key=os.getenv('GOOGLE_MAPS_API_KEY'))
 
 @app.route('/get-walking-path', methods=['POST'])
 def get_walking_path():
@@ -60,6 +69,6 @@ def get_all_walking_paths():
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
+
 if __name__ == '__main__':
     app.run(debug=True)
