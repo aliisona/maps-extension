@@ -32,7 +32,7 @@ document.getElementById('generate').addEventListener('click', () => {
         document.getElementById('walking-time').innerText = `walking time: ${walkingTime}`;
         document.getElementById('result').style.display = 'block';
 
-        // Update Google Maps URL with new path
+        // reload new url
         updateGoogleMapsUrl(start, end);
 
         // inject info into google maps page
@@ -56,10 +56,10 @@ function updateGoogleMapsUrl(start, end) {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const currentTab = tabs[0];
 
-    // Construct new Google Maps directions URL
+    // construct new google maps directions URL
     const googleMapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(start)}/${encodeURIComponent(end)}/`;
 
-    // Update the current tab's URL to reflect the new start and end points
+    // update new 
     chrome.tabs.update(currentTab.id, { url: googleMapsUrl }, function () {
       console.log('Google Maps URL updated to:', googleMapsUrl);
     });
