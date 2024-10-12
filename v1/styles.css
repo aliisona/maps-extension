@@ -1,0 +1,43 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; 
+  width: 100vh;
+  padding: 20px; 
+
+  margin: 0; 
+  font-family: Arial, sans-serif; /* Change font */
+  background-color: #f9f9f9; /* Light background for better contrast */
+}
+
+#map {
+  width: 100%; /* Full width */
+  height: 300px; /* Fixed height for the map */
+  border-radius: 8px; /* Rounded corners */
+  margin-bottom: 20px; /* Space between map and button */
+  overflow: hidden; /* Hide overflow */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow to the map */
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  width: 100%; /* Full width */
+}
+
+#calculate-button {
+  background-color: #6a5acd; /* Purple background */
+  color: white; /* White text */
+  border: none; /* No border */
+  border-radius: 25px; /* Rounded corners */
+  padding: 10px 20px; /* Vertical and horizontal padding */
+  font-size: 16px; /* Increase font size */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth background transition */
+}
+
+#calculate-button:hover {
+  background-color: #5a4bbf; /* Darker purple on hover */
+}

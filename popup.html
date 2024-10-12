@@ -1,24 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Maps</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div id="map"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Safe-Route</title>
+    <link rel="stylesheet" href="styles.css">
+    
+  </head>
+  <body>
+    <h3>Safe-Route</h3>
+    <label for="start">Start:</label>
+    <input type="text" id="start" placeholder="Start location" />
+    <label for="end">End:</label>
+    <input type="text" id="end" placeholder="End location" />
+    <button id="generate">Generate Path</button>
 
-  <form id="route-form">
-    <input type="text" id="origin" placeholder="Enter origin" required>
-    <input type="text" id="destination" placeholder="Enter destination" required>
-    <button id="calculate-button" type="submit">Calculate Danger!</button>
-  </form>
-  
-  <button id="show-route-button">Show Current Route</button>
-  
-  <script src="config.js"></script>
-  <script src="popup.js"></script>
-  
-</body>
+    <button id="use-current">Use Current Path</button>
+
+    <div id="current-path-status">Checking for current path...</div>
+
+    <div id="status"></div>
+
+    <div id="result">
+      <p id="walking-time"></p>
+      <p id="error"></p>
+    </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
 </html>

@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Google Maps Extension",
+  "version": "1.0",
+  "description": "Chrome extention to calculate the danger of a path",
+  "permissions": [
+    "activeTab",
+    "tabs"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; script-src-elem 'self';"
+} ,
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
+

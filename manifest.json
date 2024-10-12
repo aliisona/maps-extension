@@ -1,14 +1,27 @@
 {
   "manifest_version": 3,
-  "name": "Google Maps Extension",
+  "name": "Google Maps Safe-Route Integration",
   "version": "1.0",
-  "description": "Chrome extention to calculate the danger of a path",
+  "description": "Is the path you're taking safe?",
   "permissions": [
+    "geolocation",
+    "storage",
     "activeTab",
-    "tabs"
+    "scripting"
+    ],
+    "host_permissions": [
+    "http://127.0.0.1:5000/*"
   ],
   "action": {
     "default_popup": "popup.html"
-  }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.google.com/maps/*"],
+      "js": ["content.js"]
+    }
+  ]
 }
-
