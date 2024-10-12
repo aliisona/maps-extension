@@ -32,6 +32,9 @@ document.getElementById('generate').addEventListener('click', () => {
         document.getElementById('walking-time').innerText = `walking time: ${walkingTime}`;
         document.getElementById('result').style.display = 'block';
 
+        // Update Google Maps URL with new path
+        updateGoogleMapsUrl(start, end);
+
         // inject info into google maps page
         injectInfoIntoGoogleMaps(`walking time: ${walkingTime}`);
       }
@@ -48,6 +51,20 @@ document.getElementById('generate').addEventListener('click', () => {
   }
 });
 
+// function to update Google Maps URL with start and end points
+function updateGoogleMapsUrl(start, end) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    const currentTab = tabs[0];
+
+    // Construct new Google Maps directions URL
+    const googleMapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(start)}/${encodeURIComponent(end)}/`;
+
+    // Update the current tab's URL to reflect the new start and end points
+    chrome.tabs.update(currentTab.id, { url: googleMapsUrl }, function () {
+      console.log('Google Maps URL updated to:', googleMapsUrl);
+    });
+  });
+}
 // handle using the current path from google maps url
 document.getElementById('use-current').addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -87,6 +104,7 @@ document.getElementById('use-current').addEventListener('click', () => {
 
           // inject info into google maps page
           injectInfoIntoGoogleMaps(`current path time: ${walkingTime}`);
+
         }
       })
       .catch(error => {
@@ -102,7 +120,6 @@ document.getElementById('use-current').addEventListener('click', () => {
   });
 
   // inject a simple "HELLO!" to the google maps page
-  injectInfoIntoGoogleMaps("HELLO!");
 });
 
 //inject
@@ -113,9 +130,10 @@ function injectInfoIntoGoogleMaps(infoText) {
       func: (infoText) => {
         console.log('Injecting info into the side panel...');
 
-        const sidePanel = document.querySelector('.aIFcqe');  
+        const sidePanel = document.querySelector('.ue5qRc');  
         if (sidePanel) {
           const injectedDiv = document.createElement('div');
+          injectedDiv.setAttribute("id", "injectedDIV!!!");
           injectedDiv.style.color = 'blue';  
           injectedDiv.style.margin = '10px 0';
           injectedDiv.style.fontSize = '16px';

@@ -29,5 +29,37 @@ def get_walking_path():
 
     return jsonify({'duration': duration, 'steps': steps})
 
+@app.route('/get-all-walking-paths', methods=['POST'])
+def get_all_walking_paths():
+    data = request.json
+    start = data.get('start')
+    end = data.get('end')
+
+    if not start or not end:
+        return jsonify({'error': 'Start and end locations are required!'}), 400
+
+    # fetch all possible routes
+    directions_result = gmaps.directions(start, end, mode="walking", alternatives=True)
+
+    if not directions_result:
+        return jsonify({'error': 'No directions found'}), 404
+
+    # extract paths for all routes
+    all_routes = []
+    for route in directions_result:
+        leg = route['legs'][0]
+        duration = leg['duration']['text']
+        steps = [{'distance': step['distance']['text'], 'instruction': step['html_instructions']} for step in leg['steps']]
+        all_routes.append({
+            'duration': duration,
+            'steps': steps
+        })
+
+    return jsonify({'routes': all_routes})
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+    
 if __name__ == '__main__':
     app.run(debug=True)
