@@ -4,8 +4,7 @@ config.js
 
 # venv folder names
 hackharvard
-hackharvardvenv
-
+path
 # data testing
 api/Massachusets.osm
 api/CrashDetails_0ym4x1ogi0fjn1harbsnfad0.csv
