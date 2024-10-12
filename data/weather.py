@@ -25,4 +25,5 @@ def get_weather_description_boston(api_key):
         print(f"Error: Unable to fetch weather for Boston. Status code: {response.status_code}")
 
 if __name__ == "__main__":
-    get_weather_description_boston(key=os.getenv('OPENWEATHER_API_KEY'))
+    api_key = os.getenv('OPENWEATHER_API_KEY')
+    get_weather_description_boston(api_key)
