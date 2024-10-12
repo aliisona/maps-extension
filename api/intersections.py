@@ -1,4 +1,5 @@
 from pyproj import Transformer
+import requests
 try:
     from xml.etree import cElementTree as ET
 except ImportError:
@@ -34,3 +35,19 @@ def extract_intersections(osm, verbose=True):
 
     return intersection_coordinates
 
+# Boston example coordinates
+# Southwest corner: (42.30, -71.10)
+# Northeast corner: (42.40, -71.00)
+def get_osm_data(south, west, north, east):
+    url = f"https://overpass-api.de/api/interpreter?data=[out:xml];(node({south},{west},{north},{east});way({south},{west},{north},{east});rel({south},{west},{north},{east}););out body;"
+    
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        return response.text
+    else:
+        print(f"Error: {response.status_code}")
+        return None
+
+# Example with Boston
+osm_data = get_osm_data(42.30, -71.10, 42.40, -71.00)
