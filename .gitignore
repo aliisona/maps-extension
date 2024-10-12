@@ -1,5 +1,4 @@
 config.js
-api/massachusetts-latest.osm.pbf
 .DS_Store
 
 # venv folder names
@@ -8,3 +7,4 @@ hackharvard
 # data testing
 api/Massachusets.osm
 api/CrashDetails_0ym4x1ogi0fjn1harbsnfad0.csv
+ML/data/crashdata_boston.csv
