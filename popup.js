@@ -1,29 +1,75 @@
-function initMap() {
-    // Default location: center of the map if geolocation fails
-    const defaultLocation = { lat: 37.7749, lng: -122.4194 }; // San Francisco
+let map;
+let directionsService;
+let directionsRenderer;
+
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("loaded....");
+
+    const apiKey = config.GOOGLE_MAPS_API_KEY;
+
+    // load api
+    const script = document.createElement('script'); 
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyAaLjlgAZSho352xp9K8oJLt-d7ARm_iHE&libraries=places`;
+    // script.async = true;
+    // script.defer = true;
+    script.onload = initializeMap;
+});
+
+// Initialize the map and directions services
+function initializeMap() {
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer();
+
+  const mapOptions = {
+    zoom: 7,
+    center: { lat: -34.397, lng: 150.644 } // Set initial center
+  };
   
-    // Create the map
-    const map = new google.maps.Map(document.getElementById("map"), {
-      zoom: 12,
-      center: defaultLocation
-    });
-  
-    // Try HTML5 geolocation to center the map on the user's location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userLocation = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          map.setCenter(userLocation);
-        },
-        () => {
-          console.error("Geolocation failed.");
-        }
-      );
+  map = new google.maps.Map(document.getElementById('map'), mapOptions);
+  directionsRenderer.setMap(map);
+
+  // Add event listener to the form
+  document.getElementById('route-form').addEventListener('click', calculateRoute);
+}
+
+document.getElementById('show-route-button').addEventListener("click", function getCurrentRoute() {
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    const currentTab = tabs[0];
+    console.log("pressed");
+    if (currentTab.url.includes('google.com/maps/dir')) {
+      const urlParams = new URLSearchParams(currentTab.url.split('?')[1]);
+      const origin = urlParams.get('origin');
+      const destination = urlParams.get('destination');
+
+      if (origin && destination) {
+        document.getElementById('origin').value = decodeURIComponent(origin);
+        document.getElementById('destination').value = decodeURIComponent(destination);
+      }
     } else {
-      console.error("Browser doesn't support geolocation.");
+      console.warn('Not a Google Maps direction URL');
     }
-  }
-  
+  });
+})
+
+// Calculate the route based on user input
+document.getElementById('calculate-button').addEventListener("click",  function calculateRoute(event) {
+  event.preventDefault(); // Prevent form submission
+
+  const origin = document.getElementById('origin').value;
+  const destination = document.getElementById('destination').value;
+
+  const request = {
+    origin: origin,
+    destination: destination,
+    travelMode: google.maps.TravelMode.DRIVING // Set travel mode
+  };
+
+  // Call the Directions Service
+  directionsService.route(request, function(result, status) {
+    if (status === google.maps.DirectionsStatus.OK) {
+      directionsRenderer.setDirections(result);
+    } else {
+      console.error('Directions request failed due to ' + status);
+    }
+  });
+})
