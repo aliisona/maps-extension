@@ -15,19 +15,30 @@ def getStepsCoordinates():
     destination = request.args.get('destination')
     mode = request.args.get('mode') # "driving" or "walking"
 
-    # origin = "MIT, 77 Massachusetts Ave, Cambridge, MA 02139"
-    # destination = "Harvard Square, Cambridge, MA 02138"
-
     if not origin or not destination or not mode:
         return jsonify({"error": "Missing required parameters: origin, destination, or mode"}), 400
 
-    # Get directions
     directions_result = gmaps.directions(origin, destination, mode=mode)
 
-    # Print the response (for demonstration)
-    print(directions_result)
+    # For each route, get the list of coordinates representing key steps 
+    routes = []
+    for route in directions_result:
+        route_coordinates = []
 
-    return "called";
+        for leg in route['legs']:
+            for step in leg['steps']:
+                latitude = step['start_location']['lat']
+                longitude = step['start_location']['lng']
+                
+                route_coordinates.append({
+                    "longitude": longitude,
+                    "latitude": latitude
+                })
+        
+        routes.append(route_coordinates)
+
+    print(routes)
+    return jsonify(routes)
 
 if __name__ == '__main__':
     app.run(debug=True)
