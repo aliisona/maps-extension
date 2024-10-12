@@ -7,6 +7,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
+print(os.getenv('GOOGLE_MAPS_API_KEY'))
 gmaps = googlemaps.Client(key=os.getenv('GOOGLE_MAPS_API_KEY'))
 
 @app.route("/getstepscoordinates")
@@ -37,7 +38,6 @@ def getStepsCoordinates():
         
         routes.append(route_coordinates)
 
-    print(routes)
     return jsonify(routes)
 
 if __name__ == '__main__':
