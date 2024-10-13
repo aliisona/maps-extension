@@ -81,7 +81,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
           injectedDiv.setAttribute("id", `injectedDIV-${index}`);
           injectedDiv.style.color = 'blue';
           injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
-          injectedDiv.style.top = '10px';  // Adjust positioning as needed
+          injectedDiv.style.top = '16px';  // Adjust positioning as needed
           injectedDiv.style.left = '353px';  // Adjust to your desired positioning
           injectedDiv.style.fontSize = '16px';
           injectedDiv.innerText = `Safe`;
@@ -94,7 +94,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
           if (timeElement) {
             timeElement.style.color = '#70757a';  
             timeElement.style.fontSize = '0.875rem'; 
-            timeElement.style.marginTop = '20px';
+            timeElement.style.marginTop = '26px';
           }
         });
       } else {
