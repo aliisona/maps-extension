@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import googlemaps
 from flask_cors import CORS
-import os  # os
+import os
 
 from dotenv import load_dotenv
 import os
@@ -66,9 +66,6 @@ def get_all_walking_paths():
 
     return jsonify({'routes': all_routes})
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 if __name__ == '__main__':
     app.run(debug=True)

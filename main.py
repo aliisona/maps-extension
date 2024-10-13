@@ -69,6 +69,23 @@ def getSafetyRoutes():
 
     return jsonify(safety_labels)
 
+def combine_coords(coords, threshold=0.01):
+    combined = []
+
+    i = 0
+    while i < len(coords[:-1]):
+        lat1, lon1 = coords[i][0], coords[i][1]
+        lat2, lon2 = coords[i + 1][0], coords[i + 1][1]
+
+        if abs(coords[i][0] - coords[i + 1][0]) < 0.01 or abs(coords[i][1] - coords[i + 1][1]) < 0.01:
+            combined.append([lat2,lon2])
+            i += 1
+        else:
+            combined.append([lat1,lat2])
+        i += 1
+
+    return combined
+
 def safety_calculation(routes, mode):
     safety_score = 0
     weather_output = get_weather()
@@ -78,7 +95,7 @@ def safety_calculation(routes, mode):
 
     if mode == 'DRIVING':
         for i in range(len(routes)):
-            current_routes_safety = safetyIndex(routes[i])
+            current_routes_safety = safetyIndex(combine_coords(routes[i]))
             # print("current_route_safety: ", current_routes_safety)
             for j in range(len(routes[i])):
                 safety_score += 3.5 * current_routes_safety
@@ -87,8 +104,8 @@ def safety_calculation(routes, mode):
 
     else:
         for i in range(len(routes)):
-            current_routes_safety = safetyIndex(routes[i])
-            # print("current_route_safety: ", current_routes_safety)
+            current_routes_safety = safetyIndex(combine_coords(routes[i]))
+            print("current_route_safety: ", current_routes_safety)
             for j in range(len(routes[i])):
                 safety_score += 1.5 * current_routes_safety
         safety_score += 3 * weather_output
@@ -112,7 +129,7 @@ def get_weather():
     base_url = "http://api.openweathermap.org/data/2.5/weather"
     params = {
         'zip': f'{zip_code},{country_code}',
-        'appid': os.getenv('OPENWEATHER_API_KEY'),
+        'appid': os.get_env('OPENWEATHER_API_KEY'),
         'units': 'metric'  
     }
 
@@ -146,8 +163,6 @@ def get_weather():
     else:
         print(f"Error: Unable to fetch weather for Boston. Status code: {response.status_code}")
 
-
-
 def convertScoresToString(safety_scores):
     safety_labels = []
 
@@ -162,7 +177,6 @@ def convertScoresToString(safety_scores):
             safety_labels.append("DANGEROUS!!!")
 
     return safety_labels
-
 
 if __name__ == '__main__':
     app.run(debug=True)
