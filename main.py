@@ -142,7 +142,7 @@ def get_weather():
     base_url = "http://api.openweathermap.org/data/2.5/weather"
     params = {
         'zip': f'{zip_code},{country_code}',
-        'appid': os.get_env('OPENWEATHER_API_KEY'),
+        'appid': os.getenv('OPENWEATHER_API_KEY'),
         'units': 'metric'  
     }
 
