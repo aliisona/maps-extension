@@ -33,16 +33,16 @@ amountCrashses = {1: 11626, 2: 2701, 3: 1168, 4: 681, 5: 373, 6: 290, 7: 206, 8:
                   156: 4, 166: 1, 185: 1, 225: 1, 226: 1, 236: 1, 324: 1, 334: 1, 350: 1, 368: 1, 396: 1,
                   398: 1, 439: 1, 486: 1, 566: 1, 595: 1, 630: 1, 667: 1, 716: 1, 1154: 1}
 
-x = list(amountCrashses.keys())[1:]
-y = list(amountCrashses.values())[1:]
+x = list(amountCrashses.keys())
+y = list(amountCrashses.values())
 
 
 
-plt.plot(x, y)
+plt.plot(x, y, marker='o')
 
-plt.xlabel('Keys (Crash ID)')
-plt.ylabel('Values (Crash Count)')
+plt.xlabel('# of Crashes at location')
+plt.ylabel('# of locations with this many crashes')
 plt.title('Crash Data Line Graph')
-
+plt.yscale('log')
 
 plt.show()

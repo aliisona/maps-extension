@@ -1,0 +1,13 @@
+/* Importing Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* General page styling */
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #fafafa; /* Light background similar to Google apps */
+  color: #202124; /* Google's text color */
+  margin: 0;
+  padding: 20px; /* Added padding for a cleaner look */
+  width: 350px; /* Set width for popup */
+  box-sizing: border-box;
+}

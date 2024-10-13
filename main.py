@@ -7,6 +7,7 @@ import os
 import random
 from ML.intersections import *
 from data import *
+from ML.crime_level import *
 
 load_dotenv()
 app = Flask(__name__)
@@ -69,6 +70,23 @@ def getSafetyRoutes():
 
     return jsonify(safety_labels)
 
+def combine_coords(coords, threshold=0.01):
+    combined = []
+
+    i = 0
+    while i < len(coords[:-1]):
+        lat1, lon1 = coords[i][0], coords[i][1]
+        lat2, lon2 = coords[i + 1][0], coords[i + 1][1]
+
+        if abs(coords[i][0] - coords[i + 1][0]) < 0.01 or abs(coords[i][1] - coords[i + 1][1]) < 0.01:
+            combined.append([lat2,lon2])
+            i += 1
+        else:
+            combined.append([lat1,lat2])
+        i += 1
+
+    return combined
+
 def safety_calculation(routes, mode):
     safety_score = 0
     weather_output = get_weather()
@@ -78,20 +96,33 @@ def safety_calculation(routes, mode):
 
     if mode == 'DRIVING':
         for i in range(len(routes)):
-            current_routes_safety = safetyIndex(routes[i])
+            current_routes_safety = safetyIndex(combine_coords(routes[i]))
             # print("current_route_safety: ", current_routes_safety)
             for j in range(len(routes[i])):
                 safety_score += 3.5 * current_routes_safety
+                begin_lat, begin_lon = routes[i][0]
+                end_lat, end_lon = routes[i][-1]
+                begin_zip = get_zipcode_from_coordinates(begin_lat, begin_lon)
+                end_zip = get_zipcode_from_coordinates(end_lat, end_lon)
+                safety_score = 0.1 * crime_stats(begin_zip) + 0.1 * crime_stats(end_zip)
             safety_score += 0.25 * weather_output
             routes_safety.append(safety_score)
 
+
     else:
         for i in range(len(routes)):
-            current_routes_safety = safetyIndex(routes[i])
-            # print("current_route_safety: ", current_routes_safety)
+            current_routes_safety = safetyIndex(combine_coords(routes[i]))
+            print("current_route_safety: ", current_routes_safety)
             for j in range(len(routes[i])):
                 safety_score += 1.5 * current_routes_safety
+                begin_lat, begin_lon = routes[i][0]
+                end_lat, end_lon = routes[i][-1]
+                begin_zip = get_zipcode_from_coordinates(begin_lat, begin_lon)
+                end_zip = get_zipcode_from_coordinates(end_lat, end_lon)
+                # print(crime_stats(end_zip))
+                safety_score = 2 * crime_stats(begin_zip) + 3.5 * crime_stats(end_zip)
             safety_score += 3 * weather_output
+            # print("safety score: ", safety_score)
             routes_safety.append(safety_score)
 
     max_safety = max(routes_safety)
@@ -146,8 +177,6 @@ def get_weather():
     else:
         print(f"Error: Unable to fetch weather for Boston. Status code: {response.status_code}")
 
-
-
 def convertScoresToString(safety_scores):
     safety_labels = []
 
@@ -162,7 +191,6 @@ def convertScoresToString(safety_scores):
             safety_labels.append("High Risk")
 
     return safety_labels
-
 
 if __name__ == '__main__':
     app.run(debug=True)

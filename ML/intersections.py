@@ -21,56 +21,32 @@ amountCrashes = {1: 11626, 2: 2701, 3: 1168, 4: 681, 5: 373, 6: 290, 7: 206, 8: 
                   110: 1, 113: 1, 116: 1, 122: 2, 127: 2, 128: 1, 131: 1, 133: 1, 135: 1, 141: 1, 148: 1,
                   156: 4, 166: 1, 185: 1, 225: 1, 226: 1, 236: 1, 324: 1, 334: 1, 350: 1, 368: 1, 396: 1,
                   398: 1, 439: 1, 486: 1, 566: 1, 595: 1, 630: 1, 667: 1, 716: 1, 1154: 1}
+transformer = Transformer.from_crs("EPSG:26986", "EPSG:4326", always_xy=True)
 
 def convertXYtoLL(x: int, y: int) -> tuple[int, int]:
-    transformer = Transformer.from_crs("EPSG:26986", "EPSG:4326", always_xy=True)
-    out = transformer.transform(x, y)[::-1]
+    lat, lon = transformer.transform(x, y)[::-1]
+    return round(lat, 4), round(lon, 4)
 
-    lat = float(round(Decimal(out[0]), 4))
-    lon = float(round(Decimal(out[1]), 4))
-    return lat, lon
-
-def extract_intersections(osm_xml: str, verbose=True) -> list[str]:
+def extract_intersections(osm_xml: str) -> list[str]:
     root = ET.fromstring(osm_xml)
-
     counter = defaultdict(int)
-    node_coords = {}
+    node_coords = {child.attrib['id']: f"{round(Decimal(child.attrib['lat']), 4)},{round(Decimal(child.attrib['lon']), 4)}"
+                   for child in root if child.tag == 'node'}
+    
+    for way in (child for child in root if child.tag == 'way'):
+        for item in (nd for nd in way if nd.tag == 'nd'):
+            counter[item.attrib['ref']] += 1
 
-    for child in root:
-        if child.tag == 'way':
-            for item in child:
-                if item.tag == 'nd':
-                    counter[item.attrib['ref']] += 1
-
-        elif child.tag == 'node':  
-            node_id = child.attrib['id']
-            if 'lat' in child.attrib and 'lon' in child.attrib:
-                lat = float(round(Decimal(child.attrib['lat']), 4))
-                lon = float(round(Decimal(child.attrib['lon']), 4))
-                node_coords[node_id] = f"{lat},{lon}"
-
-    intersection_coordinates = [
-        node_coords[node_id]
-        for node_id, count in counter.items()
-        if count > 1 and node_id in node_coords
-    ]
-
-    return intersection_coordinates
+    return [node_coords[node_id] for node_id, count in counter.items() if count > 1 and node_id in node_coords]
 
 # Boston example coordinates
 # Southwest corner: (42.30, -71.10)
 # Northeast corner: (42.40, -71.00)
 def get_osm_data(south: int, west: int, north: int, east: int) -> str:
     url = f"https://overpass-api.de/api/interpreter?data=[out:xml];(node({south},{west},{north},{east});way({south},{west},{north},{east});rel({south},{west},{north},{east}););out body;"
+    response = requests.get(url, headers={'Accept-Encoding': 'gzip'})
     
-    headers = {'Accept-Encoding': 'gzip'}
-    response = requests.get(url, headers=headers)
-    
-    if response.status_code == 200:
-        return response.text
-    else:
-        print(f"Error: {response.status_code}")
-        return None
+    return response.text if response.status_code == 200 else None
 
 # Example with Boston
 # osm_data = get_osm_data(42.30, -71.10, 42.40, -71.00)
@@ -99,85 +75,66 @@ def csv_to_json_pandas(csv_file, json_file):
     with open(json_file, 'w') as f:
         json.dump(location_data, f, indent=4)
 
-def getCrashIndex(listCoords: list[dict[int, int]]) -> list[str]:
-    crashOut = [0]
-    for i in range(len(listCoords) - 1):
-        lat1, long1 = listCoords[i][0], listCoords[i][1]
-        lat2, long2 = listCoords[i + 1][0], listCoords[i + 1][1]
-        out = []
-        safetyScoreOut = []
-
-        south, west, north, east = min(lat1, lat2), min(long1, long2), max(lat1, lat2), max(long1, long2)
-        osmData = get_osm_data(south, west, north, east)
-        intersectionList = extract_intersections(osmData)
-
-        with open(json_file, 'r') as f:
-            data = json.load(f)
-            crashesLatLong = set(data.keys())
-            common_intersections = set(intersectionList) & crashesLatLong
-
-            for latLong in common_intersections:
-                out.append(latLong)
-
-            for x in out:
-                safety_score = calculate_safety_score(data[x])
-                if safety_score != 0:
-                    safetyScoreOut.append(calculate_safety_score(data[x]))
-
-        if len(safetyScoreOut) == 0:
-            continue
-        else:
-            crashOut.append(statistics.mean(safetyScoreOut))
-    
-    return crashOut
-
 def calculate_safety_score(crash_data: dict) -> float:
-    total_crash_weight = 0
-    total_crashes = 0
+    # total_crash_weight = 0
+    # total_crashes = 0
     
-    severity_weights = {
-        "Fatal injury (K)": 1.0,
-        "Fatal": 1.0,
-        "Serious injury": 0.8,
-        "Suspected Serious Injury (A)": 0.7,
-        "Non-fatal injury - Incapacitating": 0.6,
-        "Non-fatal injury - Non-incapacitating": 0.4,
-        "Suspected Minor Injury (B)": 0.3,
-        "Possible injury (C)": 0.3,
-        "No injury": 0.2,
-        "No Apparent Injury (O)": 0.2,
-        "Not reported": 0.1,
-        "Property damage only": 0.05
-    }
+    # severity_weights = {
+    #     "Fatal injury (K)": 1.0,
+    #     "Fatal": 1.0,
+    #     "Serious injury": 0.8,
+    #     "Suspected Serious Injury (A)": 0.7,
+    #     "Non-fatal injury - Incapacitating": 0.6,
+    #     "Non-fatal injury - Non-incapacitating": 0.4,
+    #     "Suspected Minor Injury (B)": 0.3,
+    #     "Possible injury (C)": 0.3,
+    #     "No injury": 0.2,
+    #     "No Apparent Injury (O)": 0.2,
+    #     "Not reported": 0.1,
+    #     "Property damage only": 0.05
+    # }
     
-    mean_crashes = statistics.mean(amountCrashes.values())
-    median_crashes = statistics.median(amountCrashes.values())
+    # mean_crashes = statistics.mean(amountCrashes.values())
+    # median_crashes = statistics.median(amountCrashes.values())
 
     num_crashes = crash_data[0]
-    total_crashes += num_crashes
+    # total_crashes += num_crashes
     return map_int_to_skewed_range(num_crashes)
 
 def map_int_to_skewed_range(n: int) -> float:
     if 1 <= n <= 2:
-        # Skew toward the lower end of 0-0.25
-        return 0.25 * (n - 1) / 1  # n = 1 -> 0, n = 2 -> 0.25
+        return 0.25 * (n - 1) / 1
     elif 3 <= n <= 5:
-        # Skew toward 0.5 within 0.25-0.5
-        return 0.25 + 0.25 * (n - 3) / 2  # n = 3 -> 0.25, n = 5 -> 0.5
+        return 0.25 + 0.25 * (n - 3) / 2
     elif 6 <= n <= 9:
-        # Skew toward 0.75 within 0.5-0.75
-        return 0.5 + 0.25 * (n - 6) / 3  # n = 6 -> 0.5, n = 9 -> 0.75
+        return 0.5 + 0.25 * (n - 6) / 3
     elif n >= 10:
-        # Skew toward higher numbers within 0.75-1
-        max_n = 1154  # Define the maximum value for scaling
-        return 0.75 + 0.25 * (n - 10) / (max_n - 10)  # n = 10 -> 0.75, n = 1154 -> 1
+        max_n = 1154
+        return 0.75 + 0.25 * (n - 10) / (max_n - 10)
     else:
         raise ValueError("Input must be between 1 and 1154")
 
 def safetyIndex(listCoords: list[str]) ->int:
-    crashesInProximity = getCrashIndex(listCoords)
+    with open(json_file, 'r') as f:
+        crash_data = json.load(f)
 
-    return statistics.mean(crashesInProximity)
+    crashesLatLong = set(crash_data.keys())
+    crash_scores = []
+
+    for i in range(len(listCoords) - 1):
+        lat1, lon1 = listCoords[i][0], listCoords[i][1]
+        lat2, lon2 = listCoords[i + 1][0], listCoords[i + 1][1]
+        
+        osmData = get_osm_data(min(lat1, lat2), min(lon1, lon2), max(lat1, lat2), max(lon1, lon2))
+        if osmData:
+            intersectionList = extract_intersections(osmData)
+            common_intersections = set(intersectionList) & crashesLatLong
+
+            safety_scores = [calculate_safety_score(crash_data[latLong]) for latLong in common_intersections]
+            if safety_scores:
+                crash_scores.append(statistics.mean(safety_scores))
+
+    return statistics.mean(crash_scores) if crash_scores else 0
 
 csv_file = 'maps-extension/data/BostonCrashDetails.csv'
 json_file = 'maps-extension/data/BostonCrashDetailsJson.json'
