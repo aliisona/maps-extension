@@ -9,6 +9,7 @@ body {
   margin: 0;
   padding: 20px; /* Added padding for a cleaner look */
   width: 500px; /* Set width for popup */
+  box-sizing: border-box;
   border-radius: 30px;
 
 
@@ -20,7 +21,7 @@ body {
   justify-content: center;
   padding: 20px;
   margin: 20px auto;
- 
+  padding-left: 0
 
 
 }
@@ -29,7 +30,7 @@ body {
     height: 25px;
     object-fit: contain;
   margin-right: 15px;
-  margin-left: 15px;
+  margin-left: -55px;
 
 }
 .CompanyTitle {
@@ -38,6 +39,7 @@ body {
     margin-bottom: 20px; /* Extra space below the heading */
     font-size: 20px;
     font-weight: 500;
+
 }
 
 h3 {
@@ -58,7 +60,7 @@ h3 {
   }
   
   input[type="text"] {
-    width: 70%;
+    width: 80%;
     padding: 10px; /* More comfortable padding */
     margin-bottom: 15px;
     border: 1px solid #dadce0; /* Light grey border */

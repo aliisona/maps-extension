@@ -4,15 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Safe-Route</title>
-    <link rel="stylesheet" href="popup_style.css">
+    <link rel="stylesheet" href="popup_styles.css">
     
   </head>
-  <body>
-    <h3>Safe-Route</h3>
-    <label for="start">Start:</label>
-    <input type="text" id="start" placeholder="Start location" />
-    <label for="end">End:</label>
-    <input type="text" id="end" placeholder="End location" />
+  <body style="width: 400px; margin: 0 auto;">
+    <div class = header> 
+      <img class = "logo" alt="company-logo" src = "HackHarvard Logo.png">
+      <h3 class = "CompanyTitle" >Safe-Route</h3>
+      
+    </div>
+    <label for="start">Starting Location:</label>
+    <input type="text" id="start" placeholder="Enter Location" />
+    <label for="end">Ending Location:</label>
+    <input type="text" id="end" placeholder="Enter Location" />
     <button id="generate">Generate Path</button>
 
     <button id="use-current">Use Current Path</button>
