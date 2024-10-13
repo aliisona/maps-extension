@@ -79,12 +79,27 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 
           const injectedDiv = document.createElement('div');
           injectedDiv.setAttribute("id", `injectedDIV-${index}`);
-          injectedDiv.style.color = 'blue';
+          
           injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
           injectedDiv.style.top = '16px';  // Adjust positioning as needed
           injectedDiv.style.left = '353px';  // Adjust to your desired positioning
           injectedDiv.style.fontSize = '16px';
           injectedDiv.innerText = `Safe`;
+
+          safetyLabel = "Safe"// temp => replace with input
+          // color based on text 
+          if(safetyLabel == "Safe"){
+            injectedDiv.style.color = '#00CA25';
+          }
+          else if(safetyLabel == "Low Risk"){
+            injectedDiv.style.color = '#DFD000';
+          }
+          else if(safetyLabel == "Moderate Risk"){
+            injectedDiv.style.color = '#F4AF00';
+          }
+          else{ // High Risk
+            injectedDiv.style.color = '#CA0700';
+          }
 
           // Insert the new div at the top of each route div
           targetDiv.prepend(injectedDiv);
@@ -198,13 +213,26 @@ function injectInfoIntoGoogleMaps(infoText) {
   
             const injectedDiv = document.createElement('div');
             injectedDiv.setAttribute("id", `injectedDIV-${index}`);
-            injectedDiv.style.color = 'blue';
             injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
             injectedDiv.style.top = '0';  // Adjust positioning as needed
             injectedDiv.style.left = '353px';  // Adjust to your desired positioning
             injectedDiv.style.fontSize = '16px';
             injectedDiv.innerText = `Safety of route: ${infoText[counter]}`;
   
+            // color based on text 
+            if(infoText == "Safe"){
+              injectedDiv.style.color = '#00CA25';
+            }
+            else if(infoText == "Low Risk"){
+              injectedDiv.style.color = '#DFD000';
+            }
+            else if(infoText == "Moderate Risk"){
+              injectedDiv.style.color = '#F4AF00';
+            }
+            else{ // High Risk
+              injectedDiv.style.color = '#CA0700';
+            }
+
             // Insert the new div at the top of each route div
             targetDiv.prepend(injectedDiv);
             counter+=counter
