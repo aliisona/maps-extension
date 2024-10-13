@@ -5,8 +5,7 @@ import os
 #note: need function from intersections.py
 import random
 import math 
-from function import findcrashdata()
-
+# from function import findcrashdata()
 
 
 def safety_calculation(routes, weatheroutput, crashdata, transportation_method):
