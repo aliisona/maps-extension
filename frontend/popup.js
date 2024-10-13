@@ -62,42 +62,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   });
 });
 
-chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-  chrome.scripting.executeScript({
-    target: { tabId: tabs[0].id },
-    func: () => {
-      // Find the parent container with the class 'm6QErb'
-      const parentDiv = document.querySelector('.m6QErb');
-      
-      if (parentDiv) {
-        // Get all child divs with class 'UgZKXd'
-        const routeDivs = parentDiv.querySelectorAll('.UgZKXd');
-        
-        // Iterate over each route div
-        routeDivs.forEach((routeDiv, index) => {
-          const targetDiv = routeDiv.querySelector('.XdKEzd');
-
-          const injectedDiv = document.createElement('div');
-          injectedDiv.setAttribute("id", `injectedDIV-${index}`);
-          injectedDiv.style.color = 'blue';
-          injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
-          injectedDiv.style.top = '0';  // Adjust positioning as needed
-          injectedDiv.style.left = '353px';  // Adjust to your desired positioning
-          injectedDiv.style.fontSize = '16px';
-          injectedDiv.innerText = `Safe`;
-
-          // Insert the new div at the top of each route div
-          targetDiv.prepend(injectedDiv);
-        });
-      } else {
-        console.error('Parent div .m6QErb not found on Google Maps page');
-      }
-    },
-    args: []
-  });
-});
-
-
 
 // function to update Google Maps URL with start and end points
 function updateGoogleMapsUrl(start, end) {
@@ -151,7 +115,7 @@ document.getElementById('use-current').addEventListener('click', () => {
           document.getElementById('result').style.display = 'block';
         } else {
           // inject info into google maps page
-          injectInfoIntoGoogleMaps(`Safety of route: ${data[0]}`);
+          injectInfoIntoGoogleMaps(data);
 
         }
       })
@@ -175,26 +139,39 @@ function injectInfoIntoGoogleMaps(infoText) {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id },
-      func: (infoText) => {
-        console.log('Injecting info into the side panel...');
+      func: () => {
+        // Find the parent container with the class 'm6QErb'
+        const parentDiv = document.querySelector('.m6QErb');
+        counter=0 //current counter in data
 
-        const sidePanel = document.querySelector('.ue5qRc');  
-        if (sidePanel) {
-          const injectedDiv = document.createElement('div');
-          injectedDiv.setAttribute("id", "injectedDIV!!!");
-          injectedDiv.style.color = 'blue';  
-          injectedDiv.style.margin = '10px 0';
-          injectedDiv.style.fontSize = '16px';
-          injectedDiv.innerText = infoText;
+        if (parentDiv) {
+          // Get all child divs with class 'UgZKXd'
+          const routeDivs = parentDiv.querySelectorAll('.UgZKXd');
+          
+          // Iterate over each route div
+          routeDivs.forEach((routeDiv, index) => {
+            const targetDiv = routeDiv.querySelector('.XdKEzd');
+  
+            const injectedDiv = document.createElement('div');
+            injectedDiv.setAttribute("id", `injectedDIV-${index}`);
+            injectedDiv.style.color = 'blue';
+            injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
+            injectedDiv.style.top = '0';  // Adjust positioning as needed
+            injectedDiv.style.left = '353px';  // Adjust to your desired positioning
+            injectedDiv.style.fontSize = '16px';
+            injectedDiv.innerText = `Safety of route: ${infoText[counter]}`;
+  
+            // Insert the new div at the top of each route div
+            targetDiv.prepend(injectedDiv);
+            counter+=counter
 
-          sidePanel.prepend(injectedDiv);
-
-          console.log('Injected info into the side panel:', infoText);
+          });
         } else {
-          console.error('Side panel not found on Google Maps page');
+          console.error('Parent div .m6QErb not found on Google Maps page');
         }
       },
-      args: [infoText]
+      args: []
     });
   });
+
 }
