@@ -179,5 +179,5 @@ def safetyIndex(listCoords: list[str]) ->int:
 
     return statistics.mean(crashesInProximity)
 
-csv_file = 'maps-extension/data/BostonCrashDetails.csv'
-json_file = 'maps-extension/data/BostonCrashDetailsJson.json'
+csv_file = 'data/BostonCrashDetails.csv'
+json_file = 'data/BostonCrashDetailsJson.json'
