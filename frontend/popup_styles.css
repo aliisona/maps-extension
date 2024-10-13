@@ -60,7 +60,7 @@ h3 {
   }
   
   input[type="text"] {
-    width: 70%;
+    width: 80%;
     padding: 10px; /* More comfortable padding */
     margin-bottom: 15px;
     border: 1px solid #dadce0; /* Light grey border */
