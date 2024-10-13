@@ -62,58 +62,65 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   });
 });
 
-// handle generating path from user input
-document.getElementById('generate').addEventListener('click', () => {
-  const start = document.getElementById('start').value;
-  const end = document.getElementById('end').value;
+// chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+//   chrome.scripting.executeScript({
+//     target: { tabId: tabs[0].id },
+//     func: () => {
+//       // Find the parent container with the class 'm6QErb'
+//       const parentDiv = document.querySelector('.m6QErb');
+      
+//       if (parentDiv) {
+//         // Get all child divs with class 'UgZKXd'
+//         const routeDivs = parentDiv.querySelectorAll('.UgZKXd');
+        
+//         // Iterate over each route div
+//         routeDivs.forEach((routeDiv, index) => {
+//           const targetDiv = routeDiv.querySelector('.XdKEzd');
 
-  // clear previous status and results
-  document.getElementById('status').innerText = '';
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('error').innerText = '';
+//           const injectedDiv = document.createElement('div');
+//           injectedDiv.setAttribute("id", `injectedDIV-${index}`);
+          
+//           injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
+//           injectedDiv.style.top = '16px';  // Adjust positioning as needed
+//           injectedDiv.style.left = '353px';  // Adjust to your desired positioning
+//           injectedDiv.style.fontSize = '16px';
+//           injectedDiv.innerText = `Safe`;
 
-  if (start && end) {
-    console.log('getting path from:', start, 'to:', end);
-    document.getElementById('status').innerText = 'fetching path...';
+//           safetyLabel = "Safe"// temp => replace with input
+//           // color based on text 
+//           if(safetyLabel == "Safe"){
+//             injectedDiv.style.color = '#00CA25';
+//           }
+//           else if(safetyLabel == "Low Risk"){
+//             injectedDiv.style.color = '#DFD000';
+//           }
+//           else if(safetyLabel == "Moderate Risk"){
+//             injectedDiv.style.color = '#F4AF00';
+//           }
+//           else{ // High Risk
+//             injectedDiv.style.color = '#CA0700';
+//           }
 
-    // send the request to flask
-    fetch('http://127.0.0.1:5000/getsafetyroutes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        origin: start,
-        destination: end,
-        mode: "walking" // update when we pull the mode from the FE
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById('status').innerText = '';
+//           // Insert the new div at the top of each route div
+//           targetDiv.prepend(injectedDiv);
 
-      if (data.error) {
-        document.getElementById('error').innerText = data.error;
-        document.getElementById('result').style.display = 'block';
-      } else {
-        // Update Google Maps URL with new path
-        updateGoogleMapsUrl(start, end);
+//           // Find the time element and update its style
+//           const timeElement = targetDiv.querySelector('.Fk3sm');
+//           if (timeElement) {
+//             timeElement.style.color = '#70757a';  
+//             timeElement.style.fontSize = '0.875rem'; 
+//             timeElement.style.marginTop = '26px';
+//           }
+//         });
+//       } else {
+//         console.error('Parent div .m6QErb not found on Google Maps page');
+//       }
+//     },
+//     args: []
+//   });
+// });
 
-        // inject info into google maps page
-        injectInfoIntoGoogleMaps(`Safety of route: ${data[0]}`);
-      }
-    })
-    .catch(error => {
-      console.error('fetch error:', error);
-      document.getElementById('status').innerText = '';
-      document.getElementById('error').innerText = 'error fetching data';
-      document.getElementById('result').style.display = 'block';
-    });
-  } else {
-    // display a message if start or end locations are missing
-    document.getElementById('status').innerText = 'please enter both start and end locations';
-  }
-});
+
 
 // function to update Google Maps URL with start and end points
 function updateGoogleMapsUrl(start, end) {
@@ -167,7 +174,7 @@ document.getElementById('use-current').addEventListener('click', () => {
           document.getElementById('result').style.display = 'block';
         } else {
           // inject info into google maps page
-          injectInfoIntoGoogleMaps(`Safety of route: ${data[0]}`);
+          injectInfoIntoGoogleMaps(data);
 
         }
       })
@@ -182,33 +189,117 @@ document.getElementById('use-current').addEventListener('click', () => {
       document.getElementById('status').innerText = 'no valid path found in url';
     }
   });
-
-  // inject a simple "HELLO!" to the google maps page
 });
 
 //inject
+// function injectInfoIntoGoogleMaps(infoText) {
+//   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+//     chrome.scripting.executeScript({
+//       target: { tabId: tabs[0].id },
+//       func: (infoText) => {
+//         console.log("two")
+//         // Find the parent container with the class 'm6QErb'
+//         const parentDiv = document.querySelector('.m6QErb');
+
+//         if (parentDiv) {
+//           console.log("three") 
+//           // Get all child divs with class 'UgZKXd'
+//           // const routeDivs = parentDiv.querySelectorAll('.UgZKXd');
+
+//           const routeDivs = parentDiv.querySelector('.UgZKXd');
+//           const injectedDiv = document.createElement('div');
+//           injectedDiv.setAttribute("id", "injectedDIV!!!");
+//           injectedDiv.style.color = 'blue';  
+//           injectedDiv.style.margin = '10px 0';
+//           injectedDiv.style.fontSize = '16px';
+//           injectedDiv.innerText = infoText;
+
+//           routeDivs.prepend(injectedDiv);
+          
+          // Iterate over each route div
+          // routeDivs.forEach((routeDiv, index) => {
+          //   console.log("five")
+          //   const targetDiv = routeDiv.querySelector('.XdKEzd');
+  
+          //   const injectedDiv = document.createElement('div');
+          //   injectedDiv.setAttribute("id", `injectedDIV-${index}`);
+          //   injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
+          //   injectedDiv.style.top = '0';  // Adjust positioning as needed
+          //   injectedDiv.style.left = '353px';  // Adjust to your desired positioning
+          //   injectedDiv.style.fontSize = '16px';
+          //   injectedDiv.innerText = `${infoText}`;
+  
+          //   // color based on text 
+          //   if(infoText == "Safe"){
+          //     injectedDiv.style.color = '#00CA25';
+          //   }
+          //   else if(infoText == "Low Risk"){
+          //     injectedDiv.style.color = '#DFD000';
+          //   }
+          //   else if(infoText == "Moderate Risk"){
+          //     injectedDiv.style.color = '#F4AF00';
+          //   }
+          //   else{ // High Risk
+          //     injectedDiv.style.color = '#CA0700';
+          //   }
+
+          //   // Insert the new div at the top of each route div
+          //   if (targetDiv) {
+          //     targetDiv.prepend(injectedDiv);
+          //   } else {
+          //     console.log('.XdKEzd not found inside route div');
+          //   }
+
+          // });
+//         } else {
+//           console.log("four")
+//           console.log('Parent div .m6QErb not found on Google Maps page');
+//         }
+//       },
+//       args: [infoText]
+//     });
+//   });
+// }
 function injectInfoIntoGoogleMaps(infoText) {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id },
       func: (infoText) => {
-        console.log('Injecting info into the side panel...');
 
-        const sidePanel = document.querySelector('.ue5qRc');  
-        if (sidePanel) {
+        const sidePanels = document.querySelectorAll('.UgZKXd');
+        
+        sidePanels.forEach((sideP, index) => {
           const injectedDiv = document.createElement('div');
           injectedDiv.setAttribute("id", "injectedDIV!!!");
-          injectedDiv.style.color = 'blue';  
-          injectedDiv.style.margin = '10px 0';
+          // injectedDiv.style.margin = '10px 0';
+          // injectedDiv.style.fontSize = '16px';
+          // injectedDiv.innerText = infoText[index];
+
+          injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
+          injectedDiv.style.top = '0';  // Adjust positioning as needed
+          injectedDiv.style.left = '353px';  // Adjust to your desired positioning
           injectedDiv.style.fontSize = '16px';
-          injectedDiv.innerText = infoText;
+          injectedDiv.style.marginLeft = '300px'
 
-          sidePanel.prepend(injectedDiv);
 
-          console.log('Injected info into the side panel:', infoText);
-        } else {
-          console.error('Side panel not found on Google Maps page');
-        }
+
+          if(infoText[index] == "Safe"){
+              injectedDiv.style.color = '#00CA25';
+            }
+          else if(infoText[index] == "Low Risk"){
+              injectedDiv.style.color = '#DFD000';
+            }
+          else if(infoText[index] == "Moderate Risk"){
+              injectedDiv.style.color = '#F4AF00';
+            }
+          else{ // High Risk
+              injectedDiv.style.color = '#CA0700';
+            }
+          injectedDiv.innerText = infoText[index];
+
+          sideP.prepend(injectedDiv);
+        });
+        
       },
       args: [infoText]
     });
