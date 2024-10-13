@@ -13,12 +13,16 @@ document.getElementById('generate').addEventListener('click', () => {
     document.getElementById('status').innerText = 'fetching path...';
 
     // send the request to flask
-    fetch('http://127.0.0.1:5000/get-walking-path', {
+    fetch('http://127.0.0.1:5000/getsafetyroutes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ start, end })
+      body: JSON.stringify({
+        origin: start,
+        destination: end,
+        mode: "walking" // update when we pull the mode from the FE
+      })
     })
     .then(response => response.json())
     .then(data => {
@@ -28,15 +32,11 @@ document.getElementById('generate').addEventListener('click', () => {
         document.getElementById('error').innerText = data.error;
         document.getElementById('result').style.display = 'block';
       } else {
-        const walkingTime = data.duration;
-        document.getElementById('walking-time').innerText = `walking time: ${walkingTime}`;
-        document.getElementById('result').style.display = 'block';
-
-        // reload new url
+        // Update Google Maps URL with new path
         updateGoogleMapsUrl(start, end);
 
         // inject info into google maps page
-        injectInfoIntoGoogleMaps(`walking time: ${walkingTime}`);
+        injectInfoIntoGoogleMaps(`Safety of route: ${data[0]}`);
       }
     })
     .catch(error => {
@@ -56,10 +56,10 @@ function updateGoogleMapsUrl(start, end) {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const currentTab = tabs[0];
 
-    // construct new google maps directions URL
+    // Construct new Google Maps directions URL
     const googleMapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(start)}/${encodeURIComponent(end)}/`;
 
-    // update new 
+    // Update the current tab's URL to reflect the new start and end points
     chrome.tabs.update(currentTab.id, { url: googleMapsUrl }, function () {
       console.log('Google Maps URL updated to:', googleMapsUrl);
     });
@@ -83,12 +83,16 @@ document.getElementById('use-current').addEventListener('click', () => {
       document.getElementById('status').innerText = 'using current path from url...';
 
       // send extracted start and end to backend
-      fetch('http://127.0.0.1:5000/get-walking-path', {
+      fetch('http://127.0.0.1:5000/getsafetyroutes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ start, end })
+        body: JSON.stringify({
+          origin: start,
+          destination: end,
+          mode: "walking" // update when we pull the mode from the FE
+        })
       })
       .then(response => response.json())
       .then(data => {
@@ -98,12 +102,8 @@ document.getElementById('use-current').addEventListener('click', () => {
           document.getElementById('error').innerText = data.error;
           document.getElementById('result').style.display = 'block';
         } else {
-          const walkingTime = data.duration;
-          document.getElementById('walking-time').innerText = `current path time: ${walkingTime}`;
-          document.getElementById('result').style.display = 'block';
-
           // inject info into google maps page
-          injectInfoIntoGoogleMaps(`current path time: ${walkingTime}`);
+          injectInfoIntoGoogleMaps(`Safety of route: ${data[0]}`);
 
         }
       })
