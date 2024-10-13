@@ -94,11 +94,11 @@ def safety_calculation(routes, mode):
     max_safety = max(routes_safety)
     min_safety = min(routes_safety)
 
-    # for i in range(len(routes_safety)):
-    #     if max_safety - min_safety != 0:
-    #         routes_safety[i] = (routes_safety[i] - min_safety) / (max_safety - min_safety)
-    #     else:
-    #         routes_safety[i] = 0.0
+    for i in range(len(routes_safety)):
+        if max_safety - min_safety != 0:
+            routes_safety[i] = (routes_safety[i] - min_safety) / (max_safety - min_safety)
+        else:
+            routes_safety[i] = 0.0
 
 
     return routes_safety
