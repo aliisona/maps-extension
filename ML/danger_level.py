@@ -224,10 +224,3 @@ sample_data_2 = [
             "Clear"
         ]
     ]
-
-def safetyIndex(listCoords: list[str]) ->int:
-    crashesInProximity = getCrashIndex(listCoords)
-
-    return statistics.mean(crashesInProximity)
-
-print(safetyIndex(testData))
