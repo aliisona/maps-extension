@@ -5,75 +5,8 @@ import os
 #note: need function from intersections.py
 import random
 import math 
-from function import findcrashdata()
 from intersections import *
 import json
-
-
-
-def safety_calculation(routes, weatheroutput, crashdata, transportation_method):
-    safety_score = 0
-    routes_safety = []
-
-    if transportation_method == 'car':
-        for i in range(len(routes())):
-            for b in range(len(routes[i])):
-                safety_score += 3.5 * findcrashdata(routes[i][b])
-        safety_score += 0.25 * weatheroutput
-        routes_safety.append(safety_score)
-
-    else:
-        for i in range(len(routes)):
-            for b in range(len(routes[i])):
-                safety_score += findcrashdata(routes[i][b])
-        safety_score += 3 * weatheroutput
-        routes_safety.append(safety_score)
-
-    max = routes_safety.max()
-    min = routes_safety.min()
-
-    for i in routes_safety:
-        routes_safety[i] = (routes_safety[i] - min)/(max - min)
-
-    return routes_safety
-
-
-    
-
-
-#Testing
-
-def generate_random_coordinates(num_groups, num_coordinates):
-    data = []
-    for _ in range(num_groups):
-        group = []
-        for _ in range(num_coordinates):
-            latitude = round(random.uniform(-90, 90), 7)
-            longitude = round(random.uniform(-180, 180), 7)
-            group.append({"latitude": latitude, "longitude": longitude})
-        data.append(group)
-    return data
-
-# Generate random data
-random_data = generate_random_coordinates(5, 5)  # 2 groups, each with 3 coordinates
-print(random_data)
-
-
-
-
-
-
-
-
-
-
-#INTERSECTIONS
-
-
-
-#WEATHER STUFF
-# Load environment variables from .env file
-load_dotenv()
 
 def get_weather_description_boston(api_key):
     zip_code = "02108"  # boston

@@ -10,19 +10,15 @@ load_dotenv()
 app = Flask(__name__)
 gmaps = googlemaps.Client(key=os.getenv('GOOGLE_MAPS_API_KEY'))
 
-@app.route("/getstepscoordinates")
-def getStepsCoordinates():
-    origin = request.args.get('origin')
-    destination = request.args.get('destination')
-    mode = request.args.get('mode') # "driving" or "walking"
-
+def getStepsCoordinates(origin, destination, mode):
     if not origin or not destination or not mode:
         return jsonify({"error": "Missing required parameters: origin, destination, or mode"}), 400
 
-    directions_result = gmaps.directions(origin, destination, mode=mode)
+    directions_result = gmaps.directions(origin, destination, mode=mode, alternatives=True)
 
     # For each route, get the list of coordinates representing key steps 
     routes = []
+    # print(directions_result)
     for route in directions_result:
         route_coordinates = []
 
@@ -31,13 +27,14 @@ def getStepsCoordinates():
                 latitude = step['start_location']['lat']
                 longitude = step['start_location']['lng']
                 
-                route_coordinates.append({
-                    "longitude": longitude,
-                    "latitude": latitude
-                })
-        
+                # route_coordinates.append({
+                #     "longitude": longitude,
+                #     "latitude": latitude
+                # })
+                route_coordinates.append([latitude, longitude])
+        # print("route coords", route_coordinates)
         routes.append(route_coordinates)
-
+    print("routes!", routes)
     return routes
 
 @app.route("/getsafetyroutes", methods=['POST'])
@@ -47,25 +44,25 @@ def getSafetyRoutes():
     destination = data.get('destination')
     mode = data.get('mode') # "driving" or "walking"
 
-    params = {
-        "origin": origin,
-        "destination": destination,
-        "mode": mode
-    }
+    # params = {
+    #     "origin": origin,
+    #     "destination": destination,
+    #     "mode": mode
+    # }
 
     # get list of coordinates for each route
-    route_list = []
-    routes = requests.get("http://127.0.0.1:5000/getstepscoordinates", params=params)
+    routes = getStepsCoordinates(origin, destination, mode)
+    print("routes: ", routes)
 
-    for route in (routes):
-        route_list.append(route)
+    # for route in (routes):
+    #     route_list.append(route)
     # return routes
 
     # print(routes)
 
     # get safety score for each route and convert it to a string label
     # safety_scores = [0.94, 0.12, 0.33] # mock for now while BE is done 
-    safety_scores = safety_calculation(route_list, mode)
+    safety_scores = safety_calculation(routes, mode)
     safety_labels = convertScoresToString(safety_scores)
 
     return jsonify(safety_labels)
@@ -78,15 +75,15 @@ def safety_calculation(routes, mode):
     min_safety = 0
 
     if mode == 'DRIVING':
-        for i in range(len(routes())):
-            for b in range(len(routes[i])):
+        for i in range(len(routes)):
+            for j in range(len(routes[i])):
                 safety_score += 3.5 * 1
         safety_score += 0.25 * weather_output
         routes_safety.append(safety_score)
 
     else:
         for i in range(len(routes)):
-            for b in range(len(routes[i])):
+            for j in range(len(routes[i])):
                 safety_score += random.uniform(50, 70)
         safety_score += 3 * weather_output
         routes_safety.append(safety_score)
@@ -118,7 +115,6 @@ def get_weather():
     if response.status_code == 200:
         data = response.json()
         weather_desc = data['weather'][0]['description']
-        print(f"Today's weather in Boston, MA: {weather_desc}")
         match (weather_desc):
             case "clear sky":
                 return 0
