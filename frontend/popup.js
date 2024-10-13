@@ -266,14 +266,35 @@ function injectInfoIntoGoogleMaps(infoText) {
       target: { tabId: tabs[0].id },
       func: (infoText) => {
 
-        const sidePanels = document.querySelectorAll('.ue5qRc');
+        const sidePanels = document.querySelectorAll('.UgZKXd');
         
         sidePanels.forEach((sideP, index) => {
           const injectedDiv = document.createElement('div');
           injectedDiv.setAttribute("id", "injectedDIV!!!");
-          injectedDiv.style.color = 'blue';  
-          injectedDiv.style.margin = '10px 0';
+          // injectedDiv.style.margin = '10px 0';
+          // injectedDiv.style.fontSize = '16px';
+          // injectedDiv.innerText = infoText[index];
+
+          injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
+          injectedDiv.style.top = '0';  // Adjust positioning as needed
+          injectedDiv.style.left = '353px';  // Adjust to your desired positioning
           injectedDiv.style.fontSize = '16px';
+          injectedDiv.style.marginLeft = '300px'
+
+
+
+          if(infoText[index] == "Safe"){
+              injectedDiv.style.color = '#00CA25';
+            }
+          else if(infoText[index] == "Low Risk"){
+              injectedDiv.style.color = '#DFD000';
+            }
+          else if(infoText[index] == "Moderate Risk"){
+              injectedDiv.style.color = '#F4AF00';
+            }
+          else{ // High Risk
+              injectedDiv.style.color = '#CA0700';
+            }
           injectedDiv.innerText = infoText[index];
 
           sideP.prepend(injectedDiv);
