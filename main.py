@@ -5,6 +5,8 @@ import googlemaps
 from dotenv import load_dotenv
 import os
 import random
+from ML.intersections import *
+from data import *
 
 load_dotenv()
 app = Flask(__name__)
@@ -34,7 +36,7 @@ def getStepsCoordinates(origin, destination, mode):
                 route_coordinates.append([latitude, longitude])
         # print("route coords", route_coordinates)
         routes.append(route_coordinates)
-    print("routes!", routes)
+    # print("routes!", routes)
     return routes
 
 @app.route("/getsafetyroutes", methods=['POST'])
@@ -52,7 +54,7 @@ def getSafetyRoutes():
 
     # get list of coordinates for each route
     routes = getStepsCoordinates(origin, destination, mode)
-    print("routes: ", routes)
+    # print("routes: ", routes)
 
     # for route in (routes):
     #     route_list.append(route)
@@ -76,15 +78,19 @@ def safety_calculation(routes, mode):
 
     if mode == 'DRIVING':
         for i in range(len(routes)):
+            current_routes_safety = safetyIndex(routes[i])
+            # print("current_route_safety: ", current_routes_safety)
             for j in range(len(routes[i])):
-                safety_score += 3.5 * 1
+                safety_score += 3.5 * current_routes_safety
         safety_score += 0.25 * weather_output
         routes_safety.append(safety_score)
 
     else:
         for i in range(len(routes)):
+            current_routes_safety = safetyIndex(routes[i])
+            # print("current_route_safety: ", current_routes_safety)
             for j in range(len(routes[i])):
-                safety_score += random.uniform(50, 70)
+                safety_score += 1.5 * current_routes_safety
         safety_score += 3 * weather_output
         routes_safety.append(safety_score)
 
@@ -139,6 +145,8 @@ def get_weather():
             
     else:
         print(f"Error: Unable to fetch weather for Boston. Status code: {response.status_code}")
+
+
 
 def convertScoresToString(safety_scores):
     safety_labels = []
