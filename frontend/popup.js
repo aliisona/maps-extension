@@ -1,3 +1,67 @@
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  chrome.scripting.executeScript({
+    target: { tabId: tabs[0].id },
+    func: () => {
+      const sidePanel = document.querySelector('.MlqQ3d.Hk4XGb');  
+      const optionsButton = document.querySelector('.OcYctc');  // Query the "Options" button
+
+      if (sidePanel && optionsButton) {
+        // Make sure the parent container is using flexbox to align elements in a row
+        sidePanel.style.display = 'flex';
+        sidePanel.style.alignItems = 'center';  // Vertically center elements
+        sidePanel.style.gap = '10px';  // Add spacing between elements
+
+        // Create the toggle container
+        const toggleContainer = document.createElement('div');
+        toggleContainer.style.display = 'inline-block';
+        toggleContainer.style.border = '1px solid #ccc';  // Light gray border
+        toggleContainer.style.borderRadius = '4px';  // Smaller border radius
+        toggleContainer.style.padding = '1px 4px';  // Reduce padding to make it more compact
+        toggleContainer.style.marginLeft = '40px';  // Add space after "Options"
+        toggleContainer.style.marginTop = '4px';
+        toggleContainer.style.fontSize = '12px';
+        toggleContainer.style.fontFamily = 'Roboto, Arial, sans-serif';  // Apply correct font-family
+        toggleContainer.style.backgroundColor = '#ffffff'; // Light gray background
+        toggleContainer.style.cursor = 'pointer';
+        toggleContainer.style.display = 'flex';
+        toggleContainer.style.alignItems = 'center';
+        toggleContainer.style.width = '90px';  // Set fixed width to make it compact
+
+        // Create the inner labels for Time and Safety
+        toggleContainer.innerHTML = `
+          <span id="time-label" style="color: gray; flex: 1; text-align: center;">Time</span>
+          <span style="border-left: 1px solid #ccc; height: 12px; margin: 0 4px;"></span>
+          <span id="safety-label" style="font-weight: bold; color: black;  flex: 1; text-align: center;">Safety</span>
+        `;
+
+        // Append the toggle to the side panel after the Options button
+        optionsButton.parentNode.insertBefore(toggleContainer, optionsButton.nextSibling);
+
+        // Add event listener to handle the toggle behavior
+        toggleContainer.addEventListener('click', () => {
+          const timeLabel = document.getElementById('time-label');
+          const safetyLabel = document.getElementById('safety-label');
+
+          if (timeLabel.style.fontWeight === 'bold') {
+            timeLabel.style.fontWeight = 'normal';
+            timeLabel.style.color = 'gray';
+            safetyLabel.style.fontWeight = 'bold';
+            safetyLabel.style.color = 'black';
+          } else {
+            timeLabel.style.fontWeight = 'bold';
+            timeLabel.style.color = 'black';
+            safetyLabel.style.fontWeight = 'normal';
+            safetyLabel.style.color = 'gray';
+          }
+        });
+      } else {
+        console.error('Side panel or Options button not found on Google Maps page');
+      }
+    },
+    args: []
+  });
+});
+
 // handle generating path from user input
 document.getElementById('generate').addEventListener('click', () => {
   const start = document.getElementById('start').value;
