@@ -62,6 +62,53 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   });
 });
 
+<<<<<<< HEAD
+=======
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  chrome.scripting.executeScript({
+    target: { tabId: tabs[0].id },
+    func: () => {
+      // Find the parent container with the class 'm6QErb'
+      const parentDiv = document.querySelector('.m6QErb');
+      
+      if (parentDiv) {
+        // Get all child divs with class 'UgZKXd'
+        const routeDivs = parentDiv.querySelectorAll('.UgZKXd');
+        
+        // Iterate over each route div
+        routeDivs.forEach((routeDiv, index) => {
+          const targetDiv = routeDiv.querySelector('.XdKEzd');
+
+          const injectedDiv = document.createElement('div');
+          injectedDiv.setAttribute("id", `injectedDIV-${index}`);
+          injectedDiv.style.color = 'blue';
+          injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
+          injectedDiv.style.top = '10px';  // Adjust positioning as needed
+          injectedDiv.style.left = '353px';  // Adjust to your desired positioning
+          injectedDiv.style.fontSize = '16px';
+          injectedDiv.innerText = `Safe`;
+
+          // Insert the new div at the top of each route div
+          targetDiv.prepend(injectedDiv);
+
+          // Find the time element and update its style
+          const timeElement = targetDiv.querySelector('.Fk3sm');
+          if (timeElement) {
+            timeElement.style.color = '#70757a';  
+            timeElement.style.fontSize = '0.875rem'; 
+            timeElement.style.marginTop = '20px';
+          }
+        });
+      } else {
+        console.error('Parent div .m6QErb not found on Google Maps page');
+      }
+    },
+    args: []
+  });
+});
+
+
+>>>>>>> 57d60c40bf90cf2c5394d5acd02734cd344ec57c
 
 // function to update Google Maps URL with start and end points
 function updateGoogleMapsUrl(start, end) {
