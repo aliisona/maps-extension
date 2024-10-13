@@ -155,25 +155,6 @@ def calculate_safety_score(crash_data: dict) -> float:
 
     num_crashes = crash_data[0]
     total_crashes += num_crashes
-
-    # for crash in crash_data[1:]:
-    #     crash_severity = crash[2]
-    #     nonfatal_injuries = crash[4]
-    #     fatal_injuries = crash[5]
-
-    #     severity_weight = severity_weights.get(crash_severity, 0.1)
-    #     crash_weight = severity_weight + (0.2 * nonfatal_injuries) + (0.5 * fatal_injuries)
-        
-    # crash_count = amountCrashes.get(num_crashes, 1)
-    # crash_weight *= (1 + (crash_count - median_crashes) / mean_crashes)
-    # total_crash_weight += crash_weight
-
-    
-
-    # max_possible_weight = map_int_to_skewed_range(num_crashes)
-    # safety_score = 1 - (total_crash_weight / max_possible_weight)
-
-    # return max(0, min(1, safety_score))
     return map_int_to_skewed_range(num_crashes)
 
 def map_int_to_skewed_range(n: int) -> float:
@@ -193,5 +174,10 @@ def map_int_to_skewed_range(n: int) -> float:
     else:
         raise ValueError("Input must be between 1 and 1154")
 
-csv_file = 'data/BostonCrashDetails.csv'
-json_file = 'data/BostonCrashDetailsJson.json'
+def safetyIndex(listCoords: list[str]) ->int:
+    crashesInProximity = getCrashIndex(listCoords)
+
+    return statistics.mean(crashesInProximity)
+
+csv_file = 'maps-extension/data/BostonCrashDetails.csv'
+json_file = 'maps-extension/data/BostonCrashDetailsJson.json'
