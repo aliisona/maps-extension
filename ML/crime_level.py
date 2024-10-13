@@ -23,14 +23,12 @@ def get_zipcode_from_coordinates(coordinates):
         return "Error: Geocoding service timed out or encountered an error"
     except Exception as e:
         return f"An unexpected error occurred: {str(e)}"
-
-def get_crime_data(zip_code):
+    
+def calculate_safety_score(zip_code):
     url = f'https://zylalabs.com/api/824/crime+data+by+zipcode+api/583/get+crime+rates+by+zip?zip={zip_code}'
     headers = {'Authorization': 'Bearer 5508|2OEbQwM32fjOdjq9EMKTh3clqFRLQUYO719qbhxp'}
-    response = requests.get(url, headers=headers)
-    return response.json()
+    crime_data = requests.get(url, headers=headers)
 
-def calculate_safety_score(crime_data):
     grade_values = {'A+': 1, 'A': 2, 'A-': 3, 'B+': 4, 'B': 5, 'B-': 6, 
                     'C+': 7, 'C': 8, 'C-': 9, 'D+': 10, 'D': 11, 'D-': 12, 'F': 13}
     

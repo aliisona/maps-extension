@@ -57,9 +57,6 @@ def extract_intersections(osm_xml: str, verbose=True) -> list[str]:
 
     return intersection_coordinates
 
-# Boston example coordinates
-# Southwest corner: (42.30, -71.10)
-# Northeast corner: (42.40, -71.00)
 def get_osm_data(south: int, west: int, north: int, east: int) -> str:
     url = f"https://overpass-api.de/api/interpreter?data=[out:xml];(node({south},{west},{north},{east});way({south},{west},{north},{east});rel({south},{west},{north},{east}););out body;"
     
@@ -72,8 +69,6 @@ def get_osm_data(south: int, west: int, north: int, east: int) -> str:
         print(f"Error: {response.status_code}")
         return None
 
-# Example with Boston
-# osm_data = get_osm_data(42.30, -71.10, 42.40, -71.00)
 def csv_to_json_pandas(csv_file, json_file):
     df = pd.read_csv(csv_file)
 
@@ -156,24 +151,6 @@ def calculate_safety_score(crash_data: dict) -> float:
     num_crashes = crash_data[0]
     total_crashes += num_crashes
 
-    # for crash in crash_data[1:]:
-    #     crash_severity = crash[2]
-    #     nonfatal_injuries = crash[4]
-    #     fatal_injuries = crash[5]
-
-    #     severity_weight = severity_weights.get(crash_severity, 0.1)
-    #     crash_weight = severity_weight + (0.2 * nonfatal_injuries) + (0.5 * fatal_injuries)
-        
-    # crash_count = amountCrashes.get(num_crashes, 1)
-    # crash_weight *= (1 + (crash_count - median_crashes) / mean_crashes)
-    # total_crash_weight += crash_weight
-
-    
-
-    # max_possible_weight = map_int_to_skewed_range(num_crashes)
-    # safety_score = 1 - (total_crash_weight / max_possible_weight)
-
-    # return max(0, min(1, safety_score))
     return map_int_to_skewed_range(num_crashes)
 
 def map_int_to_skewed_range(n: int) -> float:
@@ -195,3 +172,9 @@ def map_int_to_skewed_range(n: int) -> float:
 
 csv_file = 'data/BostonCrashDetails.csv'
 json_file = 'data/BostonCrashDetailsJson.json'
+
+def safetyIndex(listCoords: list[str]) ->int:
+    crashesInProximity = getCrashIndex(listCoords)
+
+    return statistics.mean(crashesInProximity)
+
