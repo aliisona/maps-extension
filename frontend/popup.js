@@ -62,8 +62,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   });
 });
 
-<<<<<<< HEAD
-=======
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   chrome.scripting.executeScript({
     target: { tabId: tabs[0].id },
@@ -108,7 +106,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 });
 
 
->>>>>>> 57d60c40bf90cf2c5394d5acd02734cd344ec57c
 
 // function to update Google Maps URL with start and end points
 function updateGoogleMapsUrl(start, end) {
