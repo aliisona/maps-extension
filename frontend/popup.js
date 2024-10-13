@@ -62,58 +62,42 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   });
 });
 
-// handle generating path from user input
-document.getElementById('generate').addEventListener('click', () => {
-  const start = document.getElementById('start').value;
-  const end = document.getElementById('end').value;
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  chrome.scripting.executeScript({
+    target: { tabId: tabs[0].id },
+    func: () => {
+      // Find the parent container with the class 'm6QErb'
+      const parentDiv = document.querySelector('.m6QErb');
+      
+      if (parentDiv) {
+        // Get all child divs with class 'UgZKXd'
+        const routeDivs = parentDiv.querySelectorAll('.UgZKXd');
+        
+        // Iterate over each route div
+        routeDivs.forEach((routeDiv, index) => {
+          const targetDiv = routeDiv.querySelector('.XdKEzd');
 
-  // clear previous status and results
-  document.getElementById('status').innerText = '';
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('error').innerText = '';
+          const injectedDiv = document.createElement('div');
+          injectedDiv.setAttribute("id", `injectedDIV-${index}`);
+          injectedDiv.style.color = 'blue';
+          injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
+          injectedDiv.style.top = '0';  // Adjust positioning as needed
+          injectedDiv.style.left = '353px';  // Adjust to your desired positioning
+          injectedDiv.style.fontSize = '16px';
+          injectedDiv.innerText = `Safe`;
 
-  if (start && end) {
-    console.log('getting path from:', start, 'to:', end);
-    document.getElementById('status').innerText = 'fetching path...';
-
-    // send the request to flask
-    fetch('http://127.0.0.1:5000/getsafetyroutes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        origin: start,
-        destination: end,
-        mode: "walking" // update when we pull the mode from the FE
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById('status').innerText = '';
-
-      if (data.error) {
-        document.getElementById('error').innerText = data.error;
-        document.getElementById('result').style.display = 'block';
+          // Insert the new div at the top of each route div
+          targetDiv.prepend(injectedDiv);
+        });
       } else {
-        // Update Google Maps URL with new path
-        updateGoogleMapsUrl(start, end);
-
-        // inject info into google maps page
-        injectInfoIntoGoogleMaps(`Safety of route: ${data[0]}`);
+        console.error('Parent div .m6QErb not found on Google Maps page');
       }
-    })
-    .catch(error => {
-      console.error('fetch error:', error);
-      document.getElementById('status').innerText = '';
-      document.getElementById('error').innerText = 'error fetching data';
-      document.getElementById('result').style.display = 'block';
-    });
-  } else {
-    // display a message if start or end locations are missing
-    document.getElementById('status').innerText = 'please enter both start and end locations';
-  }
+    },
+    args: []
+  });
 });
+
+
 
 // function to update Google Maps URL with start and end points
 function updateGoogleMapsUrl(start, end) {
