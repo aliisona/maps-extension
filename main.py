@@ -7,6 +7,7 @@ import os
 import random
 from ML.intersections import *
 from data import *
+from ML.crime_level import *
 
 load_dotenv()
 app = Flask(__name__)
@@ -82,6 +83,11 @@ def safety_calculation(routes, mode):
             # print("current_route_safety: ", current_routes_safety)
             for j in range(len(routes[i])):
                 safety_score += 3.5 * current_routes_safety
+            begin_lat, begin_lon = routes[i][0]
+            end_lat, end_lon = routes[i][-1]
+            begin_zip = get_zipcode_from_coordinates(begin_lat, begin_lon)
+            end_zip = get_zipcode_from_coordinates(end_lat, end_lon)
+            safety_score = 0.1 * crime_stats(begin_zip) + 0.1 * crime_stats(end_zip)
         safety_score += 0.25 * weather_output
         routes_safety.append(safety_score)
 
@@ -91,7 +97,14 @@ def safety_calculation(routes, mode):
             # print("current_route_safety: ", current_routes_safety)
             for j in range(len(routes[i])):
                 safety_score += 1.5 * current_routes_safety
+            begin_lat, begin_lon = routes[i][0]
+            end_lat, end_lon = routes[i][-1]
+            begin_zip = get_zipcode_from_coordinates(begin_lat, begin_lon)
+            end_zip = get_zipcode_from_coordinates(end_lat, end_lon)
+            # print(crime_stats(end_zip))
+            safety_score = 2 * crime_stats(begin_zip) + 3.5 * crime_stats(end_zip)
         safety_score += 3 * weather_output
+        # print("safety score: ", safety_score)
         routes_safety.append(safety_score)
 
     max_safety = max(routes_safety)
