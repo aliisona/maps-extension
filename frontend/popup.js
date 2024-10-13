@@ -81,13 +81,21 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
           injectedDiv.setAttribute("id", `injectedDIV-${index}`);
           injectedDiv.style.color = 'blue';
           injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
-          injectedDiv.style.top = '0';  // Adjust positioning as needed
+          injectedDiv.style.top = '10px';  // Adjust positioning as needed
           injectedDiv.style.left = '353px';  // Adjust to your desired positioning
           injectedDiv.style.fontSize = '16px';
           injectedDiv.innerText = `Safe`;
 
           // Insert the new div at the top of each route div
           targetDiv.prepend(injectedDiv);
+
+          // Find the time element and update its style
+          const timeElement = targetDiv.querySelector('.Fk3sm');
+          if (timeElement) {
+            timeElement.style.color = '#70757a';  
+            timeElement.style.fontSize = '0.875rem'; 
+            timeElement.style.marginTop = '20px';
+          }
         });
       } else {
         console.error('Parent div .m6QErb not found on Google Maps page');
