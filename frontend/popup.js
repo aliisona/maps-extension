@@ -218,7 +218,6 @@ document.getElementById('use-current').addEventListener('click', () => {
           
           // Iterate over each route div
           // routeDivs.forEach((routeDiv, index) => {
-          //   console.log("five")
           //   const targetDiv = routeDiv.querySelector('.XdKEzd');
   
           //   const injectedDiv = document.createElement('div');
@@ -242,14 +241,6 @@ document.getElementById('use-current').addEventListener('click', () => {
           //   else{ // High Risk
           //     injectedDiv.style.color = '#CA0700';
           //   }
-
-          //   // Insert the new div at the top of each route div
-          //   if (targetDiv) {
-          //     targetDiv.prepend(injectedDiv);
-          //   } else {
-          //     console.log('.XdKEzd not found inside route div');
-          //   }
-
           // });
 //         } else {
 //           console.log("four")
@@ -265,23 +256,21 @@ function injectInfoIntoGoogleMaps(infoText) {
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id },
       func: (infoText) => {
-
+        const parentDiv = document.querySelector('.m6QErb');
         const sidePanels = document.querySelectorAll('.UgZKXd');
         
         sidePanels.forEach((sideP, index) => {
+          const targetDiv = sideP.querySelector('.XdKEzd');
+
           const injectedDiv = document.createElement('div');
-          injectedDiv.setAttribute("id", "injectedDIV!!!");
-          // injectedDiv.style.margin = '10px 0';
+          injectedDiv.setAttribute("id", `injectedDIV`);
+
+          // injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
+          // injectedDiv.style.top = '16px';  // Adjust positioning as needed
+          // injectedDiv.style.left = '300px';  // Adjust to your desired positioning
           // injectedDiv.style.fontSize = '16px';
-          // injectedDiv.innerText = infoText[index];
-
-          injectedDiv.style.position = 'absolute';  // Make it overlay without affecting layout
-          injectedDiv.style.top = '0';  // Adjust positioning as needed
-          injectedDiv.style.left = '353px';  // Adjust to your desired positioning
-          injectedDiv.style.fontSize = '16px';
-          injectedDiv.style.marginLeft = '300px'
-
-
+          // injectedDiv.style.marginLeft = '300px'    
+          injectedDiv.innerText = infoText[index];      
 
           if(infoText[index] == "Safe"){
               injectedDiv.style.color = '#00CA25';
@@ -295,11 +284,17 @@ function injectInfoIntoGoogleMaps(infoText) {
           else{ // High Risk
               injectedDiv.style.color = '#CA0700';
             }
-          injectedDiv.innerText = infoText[index];
+          
+          targetDiv.prepend(injectedDiv);
 
-          sideP.prepend(injectedDiv);
+          // Find the time element and update its style
+          // const timeElement = targetDiv.querySelector('.Fk3sm');
+          // if (timeElement) {
+          //   timeElement.style.color = '#70757a';  
+          //   timeElement.style.fontSize = '0.875rem'; 
+          //   timeElement.style.marginTop = '26px';
+          // }
         });
-        
       },
       args: [infoText]
     });
