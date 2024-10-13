@@ -82,8 +82,8 @@ def safety_calculation(routes, mode):
             # print("current_route_safety: ", current_routes_safety)
             for j in range(len(routes[i])):
                 safety_score += 3.5 * current_routes_safety
-        safety_score += 0.25 * weather_output
-        routes_safety.append(safety_score)
+            safety_score += 0.25 * weather_output
+            routes_safety.append(safety_score)
 
     else:
         for i in range(len(routes)):
@@ -91,8 +91,8 @@ def safety_calculation(routes, mode):
             # print("current_route_safety: ", current_routes_safety)
             for j in range(len(routes[i])):
                 safety_score += 1.5 * current_routes_safety
-        safety_score += 3 * weather_output
-        routes_safety.append(safety_score)
+            safety_score += 3 * weather_output
+            routes_safety.append(safety_score)
 
     max_safety = max(routes_safety)
     min_safety = min(routes_safety)
@@ -155,11 +155,11 @@ def convertScoresToString(safety_scores):
         if score <= .25:
             safety_labels.append("Safe")
         elif score <= .5:
-            safety_labels.append("Moderate Risk")
+            safety_labels.append("Low Risk")
         elif score <= .75:
-            safety_labels.append("High Risk")
+            safety_labels.append("Moderate Risk")
         else:
-            safety_labels.append("DANGEROUS!!!")
+            safety_labels.append("High Risk")
 
     return safety_labels
 
